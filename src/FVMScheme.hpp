@@ -5,7 +5,9 @@
 #include <memory>
 
 #include "Compressible.hpp"
+#include "Primitive.hpp"
 #include "ThermoVar.hpp"
+#include "PrimitiveThermoVar.hpp"
 #include "Field.hpp"
 #include "VolField.hpp"
 #include "Mesh/Mesh.hpp"
@@ -31,8 +33,12 @@ class FVMScheme
                                                                                                             thermoField(VolField<ThermoVar>(mesh)),
                                                                                                             wl(Field<Compressible>()),
                                                                                                             wr(Field<Compressible>()),
+                                                                                                            ul(Field<Primitive>()),
+                                                                                                            ur(Field<Primitive>()),
                                                                                                             thermoFieldL(Field<ThermoVar>()),
                                                                                                             thermoFieldR(Field<ThermoVar>()),
+                                                                                                            primitiveThermoFieldL(Field<PrimitiveThermoVar>()),
+                                                                                                            primitiveThermoFieldR(Field<PrimitiveThermoVar>()),
                                                                                                             //boundaryFields(),
                                                                                                             cfl(0.8), maxIter(10000000),
                                                                                                             targetError(0000005),
@@ -95,9 +101,13 @@ class FVMScheme
 
         Field<Compressible> wl; //faces size
         Field<Compressible> wr;
+        Field<Primitive> ul; //faces size
+        Field<Primitive> ur;
 
         Field<ThermoVar> thermoFieldL; //faces size
         Field<ThermoVar> thermoFieldR;
+        Field<PrimitiveThermoVar> primitiveThermoFieldL; //faces size
+        Field<PrimitiveThermoVar> primitiveThermoFieldR;
 
         Field<Vars<5>> fluxes;
 
@@ -121,8 +131,8 @@ class FVMScheme
         int iter;
 
         void updateTimeStep();
-        void calculateWlWr();
         void interpolateToFaces();
+        void interpolateToFacesPrimitive();
         void calcBoundaryConditionFields();
         void calculateFluxes();
         Field<Vars<5>> calculateResidual();

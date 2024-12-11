@@ -178,9 +178,21 @@ inline Vars<N> operator/ (const Vars<N>& u, double a)
 //////////////Non member function///////////////////
 
 template <int N>
+inline double norm2sqr(const Vars<N>& u)
+{
+    double out = 0.0;
+    for (int i = 0; i < N; i++)
+    {
+        out += u[i]*u[i];
+    }
+    return out;
+}
+
+
+template <int N>
 inline double norm2(const Vars<N>& u)
 {
-    double out = 0;
+    double out = 0.0;
     for (int i = 0; i < N; i++)
     {
         out += u[i]*u[i];
@@ -256,6 +268,21 @@ inline Vars<N> min(const Vars<N>& u, const Vars<N>& v)
     for (int i = 0; i < N; i++)
     {
         out[i] = std::min(u[i], v[i]);
+    }
+    return out;
+}
+
+template <int N, int M>
+inline Vars<N+M> join(const Vars<N>& u, const Vars<M>& v)
+{
+    Vars<N+M> out;
+    for (int i = 0; i < N; i++)
+    {
+        out[i] = u[i];
+    }
+    for (int i = 0; i < M; i++)
+    {
+        out[N+i] = v[i];
     }
     return out;
 }

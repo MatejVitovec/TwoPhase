@@ -40,6 +40,15 @@ void Thermo::updateThermo(Field<ThermoVar>& thermoField, const Field<Compressibl
     }
 }
 
+void Thermo::updateThermo(Field<PrimitiveThermoVar>& thermoField, const Field<Primitive>& u) const
+{
+    #pragma omp parallel for
+    for (size_t i = 0; i < thermoField.size(); i++)
+    {
+        thermoField[i] = updateThermo(u[i], thermoField[i]);
+    }
+}
+
 void Thermo::updateThermo(VolField<ComponentThermoVar>& thermoField) const
 {
     #pragma omp parallel for
@@ -76,4 +85,14 @@ void Thermo::updateThermo(Field<ComponentThermoVar>& thermoField) const
     }
 }
 
+/////TWOFLUID
 
+VolField<TwoFluid> Thermo::calculateStete(const Field<TwoFluidCompressible>& w, const VolField<TwoFluid>& u) const
+{
+
+}
+
+void Thermo::update(Field<TwoFluid>& u) const
+{
+
+}

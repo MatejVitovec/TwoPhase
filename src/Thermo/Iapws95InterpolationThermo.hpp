@@ -17,6 +17,8 @@ class Iapws95InterpolationThermo : public Thermo, Iapws95
         Iapws95InterpolationThermo();
 
         Vars<3> updateThermo(const Compressible& data, const ThermoVar& thermoData) const;
+        Vars<3> updateThermo(const Primitive& data, const PrimitiveThermoVar& thermoData) const;
+        void updateThermo(ComponentThermoVar& thermoData) const;
         Compressible primitiveToConservative(const Vars<5>& primitive) const;
         Compressible stagnationState(double TTot, double pTot) const;
 
@@ -80,6 +82,18 @@ Vars<3> Iapws95InterpolationThermo<INTERPOLATION>::updateThermo(const Compressib
     double temperature = temperatureInterpolationFromRhoE.calcFastFind(data.density(), data.internalEnergy());
 
     return Vars<3>({temperature, pressure, soundSpeed});
+}
+
+template <typename INTERPOLATION>
+Vars<3> Iapws95InterpolationThermo<INTERPOLATION>::updateThermo(const Primitive& data, const PrimitiveThermoVar& thermoData) const
+{
+    return Vars<3>(); //TODO
+}
+
+template <typename INTERPOLATION>
+void Iapws95InterpolationThermo<INTERPOLATION>::updateThermo(ComponentThermoVar& thermoData) const
+{
+    return; ///TODO
 }
 
 template <typename INTERPOLATION>

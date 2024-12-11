@@ -28,24 +28,9 @@ std::vector<Compressible> BoundaryCondition::calc(const VolField<Compressible>& 
 
 void BoundaryCondition::correct(const Field<Compressible>& w, Field<Compressible>& wl, Field<Compressible>& wr, const Field<Mat<5,3>>& grad, const Field<Vars<5>>& phi, const Mesh& mesh, const Thermo * const thermoModel) const
 {
-
+    
 }
 
-void BoundaryCondition::updateMeshBoundary(const Mesh& mesh)
-{
-    const std::vector<Boundary>& boundaryList = mesh.getBoundaryList();
-    for (int i = 0; i < boundaryList.size(); i++)
-    {
-        if(boundary.boundaryConditionName == boundaryList[i].boundaryConditionName)
-        {
-            boundary = boundaryList[i];
-            break;
-        }
-    }
-}
-
-
-/////////////+
 
 std::vector<CompressibleMixture> BoundaryCondition::calc(const VolField<CompressibleMixture>& w, const VolField<ThermoVar>& thermoField, const Mesh& mesh, const Thermo * const thermoModel) const
 {
@@ -64,8 +49,16 @@ std::vector<CompressibleMixture> BoundaryCondition::calc(const VolField<Compress
 
 void BoundaryCondition::correct(const Field<CompressibleMixture>& w, Field<CompressibleMixture>& wl, Field<CompressibleMixture>& wr, const Field<Mat<9,3>>& grad, const Field<Vars<9>>& phi, const Mesh& mesh, const Thermo * const thermoModel) const
 {
+    
+}
+
+void BoundaryCondition::correct(const Field<Primitive>& u, Field<Primitive>& ul, Field<Primitive>& ur,
+                                const Field<Mat<5,3>>& grad, const Field<Vars<5>>& phi,
+                                const Mesh& mesh, const Thermo * const thermoModel) const
+{
 
 }
+
 
 void BoundaryCondition::updateMeshBoundary(const Mesh& mesh)
 {
@@ -78,4 +71,17 @@ void BoundaryCondition::updateMeshBoundary(const Mesh& mesh)
             break;
         }
     }
+}
+
+
+
+
+void BoundaryCondition::apply(const VolField<TwoFluid>& u, const Mesh& mesh, const Thermo * const thermoModel) const
+{
+
+}
+
+void BoundaryCondition::correct(const VolField<TwoFluid>& u, const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const Mesh& mesh, const Thermo * const thermoModel) const
+{
+
 }

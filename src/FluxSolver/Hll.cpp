@@ -1,5 +1,15 @@
 #include "Hll.hpp"
 
+Vars<5> Hll::claculateFlux(const double rhoL, const double rhoR,
+                            const Vars<3> uL, const Vars<3> uR,
+                            const double pL, const double pR,
+                            const double eL, const double eR,
+                            const double aL, const double aR,
+                            const Vars<3>& normalVector) const
+{
+    return Vars<5>(); //TODO
+}
+
 Vars<5> Hll::claculateFlux(const Compressible& wl, const Compressible& wr, const ThermoVar& thermoL, const ThermoVar& thermoR, const Vars<3>& normalVector) const
 {
     enum {sl, ss, sr};

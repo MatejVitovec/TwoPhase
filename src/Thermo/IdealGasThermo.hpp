@@ -11,6 +11,8 @@ class IdealGasThermo : public Thermo
         IdealGasThermo(double gamma_, double R_) : Thermo(), gamma(gamma_), R(R_), energyShift(1995917.326) {}
 
         Vars<3> updateThermo(const Compressible& data, const ThermoVar& thermoData) const;
+        Vars<3> updateThermo(const Primitive& data, const PrimitiveThermoVar& thermoData) const;
+        void updateThermo(ComponentThermoVar& thermoData) const;
 
         Compressible primitiveToConservative(const Vars<5>& primitive) const;
         Compressible stagnationState(double TTot, double pTot) const;
@@ -23,9 +25,13 @@ class IdealGasThermo : public Thermo
         double R;
         double energyShift;
 
-        double pressure(const Compressible& data) const;
-        double soundSpeed(const Compressible& data) const;
-        double temperature(const Compressible& data) const;
+        double p(double T, double rho) const;
+        double rho(double p, double T) const;
+        double T(double rho, double p) const;
+        double a(double rho, double p) const;
+        double e(double p, double T) const;
+        
+        double pFromRho_e(double rho, double e) const;
 
 };
 

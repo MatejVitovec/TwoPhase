@@ -116,8 +116,12 @@ void FVMScheme::init()
 
     wl = Field<Compressible>(mesh.getFacesSize());
     wr = Field<Compressible>(mesh.getFacesSize());
+    ul = Field<Primitive>(mesh.getFacesSize());
+    ur = Field<Primitive>(mesh.getFacesSize());
     thermoFieldL = Field<ThermoVar>(mesh.getFacesSize());
     thermoFieldR = Field<ThermoVar>(mesh.getFacesSize());
+    primitiveThermoFieldL = Field<PrimitiveThermoVar>(mesh.getFacesSize());
+    primitiveThermoFieldR = Field<PrimitiveThermoVar>(mesh.getFacesSize());
     //boundaryFields = std::vector<std::vector<Compressible>>(boundaryConditionList.size());
 
     grad = Field<Mat<5,3>>(mesh.getCellsSize());
@@ -170,25 +174,6 @@ void FVMScheme::setBoundaryConditions(std::vector<std::shared_ptr<BoundaryCondit
     boundaryConditionList = std::move(boundaryConditions);
 }
 
-void FVMScheme::calculateWlWr()
-{
-    //Without reconstruction
-
-    const std::vector<int>& ownerIndexList = mesh.getOwnerIndexList();
-    const std::vector<int>& neighborIndexList = mesh.getNeighborIndexList();
-
-    for (int i = 0; i < mesh.getFacesSize(); i++)
-    {        
-        wl[i] = w[ownerIndexList[i]];
-
-        int neighbour = neighborIndexList[i];
-        if(neighbour >= 0)
-        {
-            wr[i] = w[neighbour];
-        }
-    }    
-}
-
 void FVMScheme::interpolateToFaces()
 {
     const std::vector<int>& ownerIndexList = mesh.getOwnerIndexList();
@@ -196,14 +181,6 @@ void FVMScheme::interpolateToFaces()
 
     if(reconstruction)
     {
-        /*for (int boundaryId = 0; boundaryId < boundaryFields.size(); boundaryId++)
-        {
-            const std::vector<int>& boundaryFacesIndexList = boundaryConditionList[boundaryId]->getBoundary().facesIndex;
-            for (int i = 0; i < boundaryFacesIndexList.size(); i++)
-            {
-                wr[boundaryFacesIndexList[i]] = boundaryFields[boundaryId][i];
-            }
-        }*/
         for (int boundaryId = 0; boundaryId < w.getBoundaryData().size(); boundaryId++)
         {
             const std::vector<int>& boundaryFacesIndexList = boundaryConditionList[boundaryId]->getBoundary().facesIndex;
@@ -223,16 +200,6 @@ void FVMScheme::interpolateToFaces()
         const std::vector<Face>& faces = mesh.getFaceList();
         const std::vector<int>& ownerIndexList = mesh.getOwnerIndexList();
         const std::vector<int>& neighborIndexList = mesh.getNeighborIndexList();
-
-        //EOS INTERVAL PRESERVING - todo mozna smazu
-        /*for (int i = 0; i < cells.size(); i++)
-        {
-            if (w[i].density() < 0.11 || w[i].internalEnergy() < 2200000.0)
-            {
-                phi[i] = Vars<5>(0.0);
-                //std::cout << "Err, EOS range; rho: " << w[i].density() << " e: " << w[i].internalEnergy() << std::endl;
-            }
-        }*/
 
         for (int i = 0; i < faces.size(); i++)
         {
@@ -256,12 +223,8 @@ void FVMScheme::interpolateToFaces()
             boundaryCondition->correct(w, wl, wr, grad, phi, mesh, thermo.get());
         }
         
-        //wl = thermo->updateField(wl);
-        //wr = thermo->updateField(wr);
-
         thermo->updateThermo(thermoFieldL, wl);
         thermo->updateThermo(thermoFieldR, wr);
-
     }
     else
     {
@@ -286,6 +249,97 @@ void FVMScheme::interpolateToFaces()
             {
                 wr[boundaryFacesIndexList[i]] = w.boundary(boundaryId)[i];
                 thermoFieldR[boundaryFacesIndexList[i]] = thermoField.boundary(boundaryId)[i];
+            }
+        }
+    }
+}
+
+void FVMScheme::interpolateToFacesPrimitive()
+{
+    thermo->updateThermo(thermoField, w);
+
+    const std::vector<int>& ownerIndexList = mesh.getOwnerIndexList();
+    const std::vector<int>& neighborIndexList = mesh.getNeighborIndexList();
+
+    if(reconstruction)
+    {
+        VolField<Primitive> u = VolField<Primitive>(mesh);
+        for (int i = 0; i < w.size(); i++)
+        {
+            u[i] = Primitive(w[i], thermoField[i]);
+        }
+        for (int boundaryId = 0; boundaryId < w.getBoundaryData().size(); boundaryId++)
+        {
+            const std::vector<int>& boundaryFacesIndexList = boundaryConditionList[boundaryId]->getBoundary().facesIndex;
+            u.boundary(boundaryId) = std::vector<Primitive>(boundaryFacesIndexList.size());            
+            for (int i = 0; i < boundaryFacesIndexList.size(); i++)
+            {
+                u.boundary(boundaryId)[i] = Primitive(w.boundary(boundaryId)[i], thermoField.boundary(boundaryId)[i]);
+                ur[boundaryFacesIndexList[i]] = u.boundary(boundaryId)[i];
+            }
+        }
+
+        if (iter < fixGradient || iter % fixedGradStep == 0)
+        {
+            grad = gradientScheme->calculateGradient(u, mesh);
+            phi = limiter->calculateLimiter(u, grad, mesh);
+        }
+
+        const std::vector<Cell>& cells = mesh.getCellList();
+        const std::vector<Face>& faces = mesh.getFaceList();
+        const std::vector<int>& ownerIndexList = mesh.getOwnerIndexList();
+        const std::vector<int>& neighborIndexList = mesh.getNeighborIndexList();
+
+        for (int i = 0; i < faces.size(); i++)
+        {
+            int neighbour = neighborIndexList[i];
+            if(neighbour >= 0)
+            {
+                Vars<5> ulDiff = dot(grad[ownerIndexList[i]], faces[i].midpoint - cells[ownerIndexList[i]].center);
+                Vars<5> urDiff = dot(grad[neighborIndexList[i]], faces[i].midpoint - cells[neighborIndexList[i]].center);
+
+                ul[i] = u[ownerIndexList[i]] + phi[ownerIndexList[i]]*ulDiff;
+                ur[i] = u[neighborIndexList[i]] + phi[neighborIndexList[i]]*urDiff;
+            }
+            else
+            {
+                ul[i] = u[ownerIndexList[i]];
+            }
+        }
+
+        for (auto & boundaryCondition : boundaryConditionList)
+        {
+            boundaryCondition->correct(u, ul, ur, grad, phi, mesh, thermo.get());
+        }
+        
+        thermo->updateThermo(primitiveThermoFieldL, ul);
+        thermo->updateThermo(primitiveThermoFieldR, ur);
+
+    }
+    else
+    {
+        for (int i = 0; i < mesh.getFacesSize(); i++)
+        {   
+            const int own = ownerIndexList[i];
+            ul[i] = Primitive(w[own], thermoField[own]);
+            primitiveThermoFieldL[i] = PrimitiveThermoVar(w[own], thermoField[own]);
+
+            int nei = neighborIndexList[i];
+            if(nei >= 0)
+            {
+                ur[i] = Primitive(w[nei], thermoField[nei]);
+                primitiveThermoFieldR[i] = PrimitiveThermoVar(w[nei], thermoField[nei]);
+            }
+        }
+
+        for (int boundaryId = 0; boundaryId < w.getBoundaryData().size(); boundaryId++)
+        {
+            const std::vector<int>& boundaryFacesIndexList = boundaryConditionList[boundaryId]->getBoundary().facesIndex;
+
+            for (int i = 0; i < boundaryFacesIndexList.size(); i++)
+            {
+                ur[boundaryFacesIndexList[i]] = Primitive(w.boundary(boundaryId)[i], thermoField.boundary(boundaryId)[i]);
+                primitiveThermoFieldR[boundaryFacesIndexList[i]] = PrimitiveThermoVar(w.boundary(boundaryId)[i], thermoField.boundary(boundaryId)[i]);
             }
         }
     }
@@ -370,7 +424,8 @@ void FVMScheme::updateTimeStep()
 
 void FVMScheme::calculateFluxes()
 {
-    fluxes = fluxSolver->calculateFluxes(wl, wr, thermoFieldL, thermoFieldR, mesh.getFaceList());
+    //fluxes = fluxSolver->calculateFluxes(wl, wr, thermoFieldL, thermoFieldR, mesh.getFaceList());
+    fluxes = fluxSolver->calculateFluxes(ul, ur, primitiveThermoFieldL, primitiveThermoFieldR, mesh.getFaceList());
 }
 
 Field<Vars<5>> FVMScheme::calculateResidual()

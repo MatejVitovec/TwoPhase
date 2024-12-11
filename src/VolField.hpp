@@ -39,7 +39,7 @@ class VolField : public Field<T>
             return boundaryData[i];
         }
 
-        std::vector<T>& boundary(int i)
+        std::vector<T>& boundary(int i) //Predelat na Field
         {
             if (i >= boundaryData.size())
             {

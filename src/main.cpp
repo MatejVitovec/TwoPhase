@@ -15,9 +15,6 @@ int main(int argc, char** argv)
 {
     feenableexcept(FE_INVALID | FE_OVERFLOW);
 
-    //std::cout << "__cplusplus: " << __cplusplus << std::endl;
-
-
     std::string savePath;
     if (argc >1 )
     {
@@ -26,7 +23,6 @@ int main(int argc, char** argv)
     }
     else
     { 
-        //savePath = "../resultOK/lowTempAir/idealGasHLLE";
         savePath = "../results/SE1050/1ord/lowTempAir/IdealGas2";
         //savePath = "../results/SE1050/2ord/lowTempAir/idealGas";
         savePath = "../results/testMeanPressureOutlet";

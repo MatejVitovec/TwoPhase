@@ -117,7 +117,7 @@ void outputCFD::outputVTK(std::string fileName, const Mesh& mesh, const Field<Co
 }
 
 
-void outputCFD::outputVTK(std::string fileName, const Mesh& mesh, const Field<CompressibleMixture> w, const Field<ThermoVar>& thermoField) //TODO ulozeni condensation data
+/*void outputCFD::outputVTK(std::string fileName, const Mesh& mesh, const Field<CompressibleMixture> w, const Field<ThermoVar>& thermoField)
 {
     const std::vector<Vars<3>>& nodeList = mesh.getNodeList();
     const std::vector<Cell>& cellList = mesh.getCellList();
@@ -206,7 +206,7 @@ void outputCFD::outputVTK(std::string fileName, const Mesh& mesh, const Field<Co
 	f << std::endl;
 
 	f.close();
-}
+}*/
 
 void outputCFD::saveData(std::string fileName, const Field<Compressible>& w)
 {

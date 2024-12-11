@@ -33,7 +33,6 @@ class Compressible : public Vars<5>
         double internalEnergy() const;
 
         Vars<5> flux(const Vars<3>& thermoData, const Vars<3>& normalVector) const;
-
 };
 
 #endif // COMPRESSIBLE_HPP

@@ -13,6 +13,9 @@ class Iapws95Thermo : public Thermo, public Iapws95
         virtual ~Iapws95Thermo() {}
 
         Vars<3> updateThermo(const Compressible& data, const ThermoVar& thermoData) const;
+        Vars<3> updateThermo(const Primitive& data, const PrimitiveThermoVar& thermoData) const;
+        void updateThermo(ComponentThermoVar& thermoData) const;
+        
         Compressible primitiveToConservative(const Vars<5>& primitive) const;
         Compressible stagnationState(double TTot, double pTot) const;
         

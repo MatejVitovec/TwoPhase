@@ -1,5 +1,93 @@
 #include "Hllc.hpp"
 
+Vars<5> Hllc::claculateFlux(const double rhoL, const double rhoR,
+                            const Vars<3> uL, const Vars<3> uR,
+                            const double pL, const double pR,
+                            const double eL, const double eR,
+                            const double aL, const double aR,
+                            const Vars<3>& normalVector) const
+{
+    double nuL = dot(uL, normalVector);
+    double nuR = dot(uR, normalVector);
+
+    const double EL = eL + 0.5*norm2sqr(uL);
+    const double ER = eR + 0.5*norm2sqr(uR);
+    
+    //PVRS
+    double pm = std::fmax(0, 0.5*(pL + pR) - 0.5*(nuR - nuL)*0.5*(rhoL + rhoR)*0.5*(aL + aR));
+
+    double sl;
+    double sr;
+    double sm;
+
+    if (pm <= pL)
+    {
+        sl = nuL - aL;
+    }        
+    else
+    {
+        sl = 0.5*(nuL + nuR) - 0.5*(aL + aR);
+    }
+        
+    if (pm <= pR)
+    {
+        sr = nuR + aR;
+    }        
+    else
+    {
+        sr = 0.5*(nuL + nuR) + 0.5*(aL + aR);
+    }
+        
+    //contact wave speed
+    sm = pR - pL + rhoL*nuL*(sl - nuL) - rhoR*nuR*(sr - nuR);
+    sm = sm / (rhoL*(sl - nuL) - rhoR*(sr - nuR));
+
+    //HLLC scheme
+    if (sl >= 0)
+    {
+        //left state
+        return Vars<5>({rhoL*nuL,
+                        rhoL*nuL*uL[0] + pL*normalVector[0],
+                        rhoL*nuL*uL[1] + pL*normalVector[1],
+                        rhoL*nuL*uL[2] + pL*normalVector[2],
+                        rhoL*nuL*(EL + pL/rhoL)});
+    }
+    else if (sr <= 0)
+    {
+        //right state
+        return Vars<5>({rhoR*nuR,
+                        rhoR*nuR*uR[0] + pR*normalVector[0],
+                        rhoR*nuR*uR[1] + pR*normalVector[1],
+                        rhoR*nuR*uR[2] + pR*normalVector[2],
+                        rhoR*nuR*(ER + pR/rhoR)});
+                        
+    }
+    else if (sm >= 0)
+    {
+        //middle-left state
+        pm = pL + rhoL*(sl - nuL)*(sm - nuL);
+        const double rhoM = rhoL*(sl - nuL)/(sl - sm);
+
+        return Vars<5>({rhoL*nuL                            + sl*(rhoM - rhoL),
+                        rhoL*nuL*uL[0] + pL*normalVector[0] + sl*((rhoM - rhoL)*uL[0] + (pm - pL)/(sl - sm)*normalVector[0]),
+                        rhoL*nuL*uL[1] + pL*normalVector[1] + sl*((rhoM - rhoL)*uL[1] + (pm - pL)/(sl - sm)*normalVector[1]),
+                        rhoL*nuL*uL[2] + pL*normalVector[2] + sl*((rhoM - rhoL)*uL[2] + (pm - pL)/(sl - sm)*normalVector[2]),
+                        rhoL*nuL*(EL + pL/rhoL)             + sl*((rhoM - rhoL)*EL + (pm*sm - pL*nuL)/(sl - sm))});
+    }
+    else
+    {
+        //middle-right state
+        pm = pR + rhoR*(sr - nuR)*(sm - nuR);
+        const double rhoM = rhoR*(sr - nuR)/(sr - sm);
+        return Vars<5>({rhoR*nuR                            + sr*(rhoM - rhoR),
+                        rhoR*nuR*uR[0] + pR*normalVector[0] + sr*((rhoM - rhoR)*uR[0] + (pm - pR)/(sr - sm)*normalVector[0]),
+                        rhoR*nuR*uR[1] + pR*normalVector[1] + sr*((rhoM - rhoR)*uR[1] + (pm - pR)/(sr - sm)*normalVector[1]),
+                        rhoR*nuR*uR[2] + pR*normalVector[2] + sr*((rhoM - rhoR)*uR[2] + (pm - pR)/(sr - sm)*normalVector[2]),
+                        rhoR*nuR*(ER + pR/rhoR)             + sr*((rhoM - rhoR)*ER + (pm*sm - pR*nuR)/(sr - sm))});
+    }
+}
+
+
 Vars<5> Hllc::claculateFlux(const Compressible& wl, const Compressible& wr, const ThermoVar& thermoL, const ThermoVar& thermoR, const Vars<3>& normalVector) const
 {
     double rhoL = wl.density();

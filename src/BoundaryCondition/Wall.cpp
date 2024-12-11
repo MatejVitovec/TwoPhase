@@ -30,6 +30,31 @@ void Wall::correct(const Field<Compressible>& w, Field<Compressible>& wl, Field<
     }
 }
 
+void Wall::correct(const Field<Primitive>& u, Field<Primitive>& ul, Field<Primitive>& ur, const Field<Mat<5,3>>& grad, const Field<Vars<5>>& phi, const Mesh& mesh, const Thermo * const thermoModel) const
+{
+    const std::vector<Face>& faces = mesh.getFaceList();
+    const std::vector<Cell>& cells = mesh.getCellList();
+    const std::vector<int>& ownerIndexList = mesh.getOwnerIndexList();
+    const std::vector<int>& neighborIndexList = mesh.getNeighborIndexList();
+
+    for (auto & faceIndex : boundary.facesIndex)
+    {
+        Vars<5> ulDiff = dot(grad[ownerIndexList[faceIndex]], faces[faceIndex].midpoint - cells[ownerIndexList[faceIndex]].center);
+
+        ul[faceIndex] = u[ownerIndexList[faceIndex]] + phi[ownerIndexList[faceIndex]]*ulDiff;
+
+        Primitive out = ul[faceIndex];
+    
+        const Vars<3> normalVector = faces[faceIndex].normalVector;
+        Vars<3> ghostVelocity = out.velocity() - 2*out.normalVelocity(normalVector)*faces[faceIndex].normalVector;
+
+        out[Primitive::U] = ghostVelocity[0];
+        out[Primitive::V] = ghostVelocity[1];
+        out[Primitive::W] = ghostVelocity[2];
+
+        ur[faceIndex] = out;
+    }
+}
 
 ////////
 

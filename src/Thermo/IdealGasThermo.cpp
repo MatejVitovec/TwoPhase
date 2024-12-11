@@ -2,26 +2,62 @@
 
 #include "IdealGasThermo.hpp"
 
-double IdealGasThermo::pressure(const Compressible& data) const
+double IdealGasThermo::p(double T, double rho) const
 {
-    return (gamma - 1.0)*data.density()*((data.totalEnergy() - 0.5*data.absVelocity2() - energyShift)); //pridan posun energie
+    return rho*T*R;
 }
 
-double IdealGasThermo::soundSpeed(const Compressible& data) const
+double IdealGasThermo::rho(double p, double T) const
 {
-    return std::sqrt((gamma*std::max(0.0, pressure(data)))/data[Compressible::RHO]);
+    return p/(T*R);
 }
 
-double IdealGasThermo::temperature(const Compressible& data) const
+double IdealGasThermo::T(double rho, double p) const
 {
-    return pressure(data)/(R*data[Compressible::RHO]);
+    return p/(rho*R);
 }
+
+double IdealGasThermo::a(double rho, double p) const
+{
+    return std::sqrt((gamma*std::max(0.0, p))/rho);
+}
+
+double IdealGasThermo::e(double p, double T) const
+{
+    return p/((gamma - 1.0)*rho(p, T)) + energyShift;
+}
+        
+double IdealGasThermo::pFromRho_e(double rho, double e) const
+{
+    return (gamma - 1.0)*rho*(e - energyShift);
+}
+
 
 Vars<3> IdealGasThermo::updateThermo(const Compressible& data, const ThermoVar& thermoData) const
 {
-    return Vars<3>({temperature(data), pressure(data), soundSpeed(data)});
+    //return Vars<3>({temperature(data), pressure(data), soundSpeed(data)});
+
+    const double density = data.density();
+    const double pressure = pFromRho_e(density, data.internalEnergy());
+    return Vars<3>({T(density, pressure), pressure, a(density, pressure)});
 }
 
+Vars<3> IdealGasThermo::updateThermo(const Primitive& data, const PrimitiveThermoVar& thermoData) const
+{
+    const double pressure = data.pressure();
+    const double temperature = data.temperature();
+    const double density = rho(pressure, temperature);
+    return Vars<3>({density, e(pressure, temperature), a(density, pressure)});
+}
+
+void IdealGasThermo::updateThermo(ComponentThermoVar& thermoData) const
+{
+    const double density = thermoData.density();
+    const double pressure = pFromRho_e(density, thermoData.internalEnergy());
+    thermoData[ComponentThermoVar::T] = T(density, pressure);
+    thermoData[ComponentThermoVar::P] = pressure;
+    thermoData[ComponentThermoVar::A] = a(density, pressure);
+}
 
 
 Compressible IdealGasThermo::primitiveToConservative(const Vars<5>& primitive) const
@@ -51,7 +87,7 @@ Compressible IdealGasThermo::stagnationState(double TTot, double pTot) const
 
 Compressible IdealGasThermo::isentropicInlet(double pTot, double TTot, double rhoTot, double sTot, double hTot, Vars<3> velocityDirection, Compressible stateIn, ThermoVar thermoIn) const
 {
-    double p = std::min(pressure(stateIn), pTot);
+    double p = std::min(pFromRho_e(stateIn.density(), stateIn.internalEnergy()), pTot);
     double M2 = (2.0/(gamma - 1.0))*(std::pow((pTot/p), ((gamma - 1.0)/gamma)) - 1.0);
     double T = TTot/(1.0 + ((gamma - 1.0)/2)*M2);
     double rho = p/(R*T);

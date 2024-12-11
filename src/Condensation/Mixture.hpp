@@ -4,7 +4,7 @@
 #include "../VolField.hpp"
 
 #include "CompressibleMixture.hpp"
-#include "../Thermo/ComponentThermoVar.hpp"
+#include "../ComponentThermoVar.hpp"
 
 class Mixture
 {

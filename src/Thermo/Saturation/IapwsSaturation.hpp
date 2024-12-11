@@ -4,7 +4,6 @@
 #include <array>
 #include <vector>
 
-#include "NonLinearSolver/NewtonMethod.hpp"
 
 class IapwsSaturation
 {

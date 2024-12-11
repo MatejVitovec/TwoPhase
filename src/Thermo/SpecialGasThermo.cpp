@@ -13,6 +13,26 @@ Vars<3> SpecialGasThermo::updateThermo(const Compressible& data, const ThermoVar
     return Vars<3>({T, p(rho, T), a(rho, T)});
 }
 
+Vars<3> SpecialGasThermo::updateThermo(const Primitive& data, const PrimitiveThermoVar& thermoData) const
+{
+    double pressure = data.pressure();
+    double T = data.temperature();
+
+    double rho = rhoFromTP(T, pressure, thermoData.density());
+
+    return Vars<3>({rho, e(rho, T), a(rho, T)});
+}
+
+void SpecialGasThermo::updateThermo(ComponentThermoVar& thermoData) const
+{
+    double rho = thermoData.density();
+    double T = tFromRhoE(rho, thermoData.internalEnergy(), thermoData.temperature());
+
+    thermoData[ComponentThermoVar::T] = T;
+    thermoData[ComponentThermoVar::P] = p(rho, T);
+    thermoData[ComponentThermoVar::A] = a(rho, T);
+}
+
 Compressible SpecialGasThermo::primitiveToConservative(const Vars<5>& primitive) const
 {
     double rho = primitive[0];

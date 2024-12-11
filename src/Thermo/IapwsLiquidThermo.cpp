@@ -3,12 +3,12 @@
 
 void IapwsLiquidThermo::updateThermoFromT(ComponentThermoVar& thermoData) const
 {
-    double temperature= thermoData.temperature();
+    /*double temperature= thermoData.temperature();
     if(temperature < 270) { return; }
     
     double rho = saturatedLiquidDensity(temperature);
     double e = saturatedLiquidInternalEnergy(temperature);
-    thermoData.updateDensityAndInternalEnergy(rho, e);
+    thermoData.updateDensityAndInternalEnergy(rho, e);*/
 }
 
 void IapwsLiquidThermo::updateThermoFromT(Field<ComponentThermoVar>& thermoField) const

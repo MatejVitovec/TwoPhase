@@ -11,6 +11,7 @@ class IapwsLiquidThermo : public IapwsSaturation
         IapwsLiquidThermo() {}
 
         Vars<3> updateThermo(const Compressible& data, const ThermoVar& thermoData) const;
+        Vars<3> updateThermo(const Primitive& data, const PrimitiveThermoVar& thermoData) const;
         
         void updateThermo(ComponentThermoVar& thermoData) const;
         void updateThermoFromT(ComponentThermoVar& thermoData) const;

@@ -49,6 +49,11 @@ Compressible MeanPressureOutlet::calculateState(const Compressible& w, const The
     return Compressible();
 }
 
+CompressibleMixture MeanPressureOutlet::calculateState(const CompressibleMixture& w, const ThermoVar& thermoVar, const Face& f, const Thermo * const thermoModel) const
+{
+    return CompressibleMixture();
+}
+
 
 std::vector<Compressible> MeanPressureOutlet::calc(const VolField<Compressible>& w, const VolField<ThermoVar>& thermoField, const Mesh& mesh, const Thermo * const thermoModel) const
 {
