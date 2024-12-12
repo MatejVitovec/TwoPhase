@@ -24,7 +24,7 @@ double StiffenedGasThermo::a(double rho, double p) const
 
 double StiffenedGasThermo::e(double p, double T) const
 {
-    return (cp/gamma)*T + pInf/p;
+    return (cp/gamma)*T + pInf/p; //CHYBA
 }
         
 double StiffenedGasThermo::pFromRho_e(double rho, double e) const
