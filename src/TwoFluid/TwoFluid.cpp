@@ -1,99 +1,6 @@
 #include <cmath>
 #include "TwoFluid.hpp"
 
-/*double TwoFluid::alpha() const
-{
-    return data[ALPHA];
-}
-
-double TwoFluid::pressure() const
-{
-    return thermoData[P];
-}
-
-double TwoFluid::temperatureG() const
-{
-    return data[T_G];
-}
-
-double TwoFluid::temperatureL() const
-{
-    return data[T_L];
-}
-
-Vars<3> TwoFluid::velocityG() const
-{
-    return Vars<3>({data[U_G], data[V_G], data[W_G]});
-}
-
-double TwoFluid::absVelocityG() const
-{
-    return std::sqrt(this->absVelocity2G());
-}
-
-double TwoFluid::absVelocity2G() const
-{
-    return data[U_G]*data[U_G] + data[V_G]*data[V_G] + data[W_G]*data[W_G];
-}
-
-double TwoFluid::normalVelocityG(const Vars<3>& normalVector) const
-{
-    return dot(this->velocityG(), normalVector);
-}
-
-double TwoFluid::velocityUG() const
-{
-    return data[U_G];
-}
-
-double TwoFluid::velocityVG() const
-{
-    return data[V_G];
-}
-
-double TwoFluid::velocityWG() const
-{
-    return data[W_G];
-}
-
-
-
-Vars<3> TwoFluid::velocityL() const
-{
-    return Vars<3>({data[U_L], data[V_L], data[W_L]});
-}
-
-double TwoFluid::absVelocityL() const
-{
-    return std::sqrt(this->absVelocity2L());
-}
-
-double TwoFluid::absVelocity2L() const
-{
-    return data[U_L]*data[U_L] + data[V_L]*data[V_L] + data[W_L]*data[W_L];
-}
-
-double TwoFluid::normalVelocityL(const Vars<3>& normalVector) const
-{
-    return dot(this->velocityL(), normalVector);
-}
-
-double TwoFluid::velocityUL() const
-{
-    return data[U_L];
-}
-
-double TwoFluid::velocityVL() const
-{
-    return data[V_L];
-}
-
-double TwoFluid::velocityWL() const
-{
-    return data[W_L];
-}*/
-
-
 double TwoFluid::densityG() const
 {
     return thermoData[RHO_G];
@@ -137,7 +44,42 @@ double TwoFluid::interfacialPressure() const
 
 void TwoFluid::blend()
 {
-    //TODO implement
+    if (alphaL() <= epsilonMin)
+    {
+        data[ALPHA] = 1.0 - epsilonMin;
+        data[U_L] = data[U_G];
+        data[V_L] = data[V_G];
+        data[W_L] = data[W_G];
+        data[T_L] = data[T_G];
+    }
+    else if (alphaL() < epsilonMax)
+    {
+        const double xi = (alphaG() - epsilonMin)/(epsilonMax - epsilonMin);
+        const double gFunc = -std::pow(xi, 2.0)*(2*xi - 3.0);
+
+        data[U_L] = gFunc*data[U_L] + (1.0 - gFunc)*data[U_G];
+        data[V_L] = gFunc*data[V_L] + (1.0 - gFunc)*data[V_G];
+        data[W_L] = gFunc*data[W_L] + (1.0 - gFunc)*data[W_G];
+        data[T_L] = gFunc*data[T_L] + (1.0 - gFunc)*data[T_G];
+    }
+    else if (alphaG() <= epsilonMin)
+    {
+        data[ALPHA] = epsilonMin;
+        data[U_G] = data[U_L];
+        data[V_G] = data[V_L];
+        data[W_G] = data[W_L];
+        data[T_G] = data[T_L];
+    }
+    else if (alphaG() < epsilonMax)
+    {
+        const double xi = (alphaL() - epsilonMin)/(epsilonMax - epsilonMin);
+        const double gFunc = -std::pow(xi, 2.0)*(2*xi - 3.0);
+
+        data[U_G] = gFunc*data[U_G] + (1.0 - gFunc)*data[U_L];
+        data[V_G] = gFunc*data[V_G] + (1.0 - gFunc)*data[V_L];
+        data[W_G] = gFunc*data[W_G] + (1.0 - gFunc)*data[W_L];
+        data[T_G] = gFunc*data[T_G] + (1.0 - gFunc)*data[T_L];
+    }
 }
 
 std::array<double, 6>& TwoFluid::getThermoData()

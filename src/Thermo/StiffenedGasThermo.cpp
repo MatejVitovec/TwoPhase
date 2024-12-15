@@ -2,6 +2,16 @@
 
 #include "StiffenedGasThermo.hpp"
 
+double StiffenedGasThermo::R() const
+{
+    return cp*(gamma- 1.0)/gamma;
+}
+
+double StiffenedGasThermo::cv() const
+{
+    return cp/gamma;
+}
+
 double StiffenedGasThermo::p(double T, double rho) const
 {
     return ((gamma - 1.0)/gamma)*cp*rho*T - pInf;
@@ -24,12 +34,32 @@ double StiffenedGasThermo::a(double rho, double p) const
 
 double StiffenedGasThermo::e(double p, double T) const
 {
-    return (cp/gamma)*T + pInf/p; //CHYBA
+    return ((cp/gamma)*T)*((pInf*(gamma - 1.0))/(p + pInf) + 1.0);
 }
         
 double StiffenedGasThermo::pFromRho_e(double rho, double e) const
 {
     return (gamma - 1.0)*rho*e - (gamma - 1.0)*pInf;
+}
+
+double StiffenedGasThermo::rhoDiffP(double p, double T) const
+{
+    return gamma/(T*cp*(gamma - 1.0));
+}
+
+double StiffenedGasThermo::rhoDiffT(double p, double T) const
+{
+    return -(gamma*(p + pInf))/(T*T*cp*(gamma - 1.0));
+}
+
+double StiffenedGasThermo::eDiffP(double p, double T) const
+{
+    return -(cp/gamma)*T*((pInf*(gamma - 1.0))/std::pow(p + pInf, 2.0));
+}
+
+double StiffenedGasThermo::eDiffT(double p, double T) const
+{
+    return (cp/gamma)*((pInf*(gamma - 1.0))/(p + pInf) + 1.0);
 }
 
 
@@ -90,7 +120,7 @@ Compressible StiffenedGasThermo::isentropicInlet(double pTot, double TTot, doubl
     double p = std::min(pFromRho_e(stateIn.density(), stateIn.internalEnergy()), pTot);
     double M2 = (2.0/(gamma - 1.0))*(std::pow((pTot/p), ((gamma - 1.0)/gamma)) - 1.0);
     double T = TTot/(1.0 + ((gamma - 1.0)/2)*M2);
-    double rho = p/(R*T);
+    double rho = p/(R()*T);
     double a = std::sqrt((gamma*p)/rho);
     double absU= std::sqrt(M2)*a;
 

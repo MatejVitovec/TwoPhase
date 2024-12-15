@@ -28,6 +28,9 @@ class StiffenedGasThermo : public Thermo
         double cp;
         double pInf;
 
+        double R() const;
+        double cv() const;
+
         double p(double T, double rho) const;
         double rho(double p, double T) const;
         double T(double rho, double p) const;
@@ -35,6 +38,11 @@ class StiffenedGasThermo : public Thermo
         double e(double p, double T) const;
         
         double pFromRho_e(double rho, double e) const;
+
+        double rhoDiffP(double p, double T) const;
+        double rhoDiffT(double p, double T) const;
+        double eDiffP(double p, double T) const;
+        double eDiffT(double p, double T) const;
 
 };
 
