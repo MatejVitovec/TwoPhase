@@ -1,5 +1,5 @@
-#ifndef FVMSCHEME_HPP
-#define FVMSCHEME_HPP
+#ifndef TWOFLUIDFVMSCHEME_HPP
+#define TWOFLUIDFVMSCHEME_HPP
 
 #include <vector>
 #include <memory>
@@ -10,8 +10,8 @@
 #include "../Field.hpp"
 #include "../VolField.hpp"
 #include "../Mesh/Mesh.hpp"
-#include "TwoFluidFluxSolver/TwoFluidFluxSolver.hpp"
-#include "../Thermo/Thermo.hpp"
+#include "TwoFluidFlux/TwoFluidFlux.hpp"
+#include "TwoFluidThermo/TwoFluidThermo.hpp"
 #include "../GradientScheme/GradientScheme.hpp"
 #include "../Limiter/Limiter.hpp"
 #include "../BoundaryCondition/BoundaryCondition.hpp"
@@ -26,7 +26,7 @@ class TwoFluidFVMScheme
 {
     public:
 
-        TwoFluidFVMScheme(Mesh&& mesh_, std::unique_ptr<TwoFluidFluxSolver> fluxSolver_, std::unique_ptr<Thermo> thermo_) : mesh(std::move(mesh_)),
+        TwoFluidFVMScheme(Mesh&& mesh_, std::unique_ptr<TwoFluidFlux> fluxSolver_, std::unique_ptr<TwoFluidThermo> thermo_) : mesh(std::move(mesh_)),
             fluxSolver(std::move(fluxSolver_)),
             thermo(std::move(thermo_)),
             w(Field<TwoFluidCompressible>(mesh.getCellsSize())),
@@ -55,7 +55,7 @@ class TwoFluidFVMScheme
         void setReconstructionSettings(bool reconstruction_);
         void setSavePath(std::string path) {savePath = path;}
 
-        void setThermoModel(std::unique_ptr<Thermo> thermo_) {thermo = std::move(thermo_);}
+        void setThermoModel(std::unique_ptr<TwoFluidThermo> thermo_) {thermo = std::move(thermo_);}
         
         double getCfl() const;
         int getMaxIter() const;
@@ -64,7 +64,7 @@ class TwoFluidFVMScheme
         bool getReconstructionSettings() const;
         std::string getSavePath() const { return savePath; }
         const Mesh& getMesh() const;
-        const Thermo* getThermoRef();
+        const TwoFluidThermo* getThermoRef();
 
         void setInitialConditions(TwoFluidPrimitive initialCondition);
 
@@ -78,8 +78,8 @@ class TwoFluidFVMScheme
         
         
     protected:
-        std::unique_ptr<TwoFluidFluxSolver> fluxSolver;
-        std::unique_ptr<Thermo> thermo;
+        std::unique_ptr<TwoFluidFlux> fluxSolver;
+        std::unique_ptr<TwoFluidThermo> thermo;
         std::unique_ptr<GradientScheme> gradientScheme;
         std::unique_ptr<Limiter> limiter;
 
@@ -126,4 +126,4 @@ class TwoFluidFVMScheme
 
 
 
-#endif // FVMSCHEME_HPP
+#endif // TWOFLUIDFVMSCHEME_HPP

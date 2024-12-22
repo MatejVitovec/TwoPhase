@@ -87,7 +87,7 @@ void Thermo::updateThermo(Field<ComponentThermoVar>& thermoField) const
 
 /////TWOFLUID
 
-VolField<TwoFluid> Thermo::calculateStete(const Field<TwoFluidCompressible>& w, const VolField<TwoFluid>& u) const
+void Thermo::updateFromConservative(VolField<TwoFluid>& u, const Field<TwoFluidCompressible>& w) const
 {
 
 }

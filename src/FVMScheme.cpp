@@ -160,6 +160,11 @@ void FVMScheme::applyFreeBoundaryCondition()
         boundaryCondition->updateMeshBoundary(mesh);
     }
 
+    for (int i = 0; i < boundaryConditionList.size(); i++)
+    {
+        boundaryConditionList[i]->updateId(i);
+    }
+
     for(auto& boundaryCondition : boundaryConditionList)
     {
         if(boundaryCondition->getType() == BoundaryCondition::PERIODICITY)

@@ -320,4 +320,11 @@ Vars<3> cross(const Vars<3>& u, const Vars<3>& v);
 Vars<3> angleAngleToUnit(double xy, double xz);
 
 
+template <typename T>
+int sgn(T val)
+{
+    return (T(0) < val) - (val < T(0));
+}
+
+
 #endif // VARS_HPP

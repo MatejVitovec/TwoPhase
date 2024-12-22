@@ -12,7 +12,7 @@ class TwoFluidCompressible : public Vars<10>
         using Vars<10>::operator+=;
         using Vars<10>::operator-=;
 
-        enum {ALPHA_RHO_G, ALPHA_RHO_U_G, ALPHA_RHO_V_G, ALPHA_RHO_W_G, ALPHA_RHO_E_G, ALPHA_RHO_L, ALPHA_RHO_U_L, ALPHA_RHO_V_L, ALPHA_RHO_W_L, ALPHA_RHO_E_L};
+        enum {ALPHA_RHO_G, ALPHA_RHO_U_G, ALPHA_RHO_V_G, ALPHA_RHO_W_G, ALPHA_RHO_E_PINT_G, ALPHA_RHO_L, ALPHA_RHO_U_L, ALPHA_RHO_V_L, ALPHA_RHO_W_L, ALPHA_RHO_E_PINT_L};
 
         TwoFluidCompressible() : Vars<10>() {}
         TwoFluidCompressible(const Vars<10>& varsIn) : Vars<10>(varsIn) {}
@@ -30,8 +30,6 @@ class TwoFluidCompressible : public Vars<10>
         double velocityUG() const;
         double velocityVG() const;
         double velocityWG() const;
-        double totalEnergyG() const;
-        double internalEnergyG() const;
 
         double alphaDensityL() const;
         double densityL(double alpha);
@@ -42,8 +40,6 @@ class TwoFluidCompressible : public Vars<10>
         double velocityUL() const;
         double velocityVL() const;
         double velocityWL() const;
-        double totalEnergyL() const;
-        double internalEnergyL() const;
 
         //Vars<10> flux(const Vars<3>& thermoData, const Vars<3>& normalVector) const;
 };

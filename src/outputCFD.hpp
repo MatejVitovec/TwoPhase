@@ -4,7 +4,8 @@
 #include "Mesh/Mesh.hpp"
 #include "Field.hpp"
 #include "Compressible.hpp"
-#include "Condensation/CompressibleMixture.hpp"
+#include "Mixture/CompressibleMixture.hpp"
+#include "TwoFluid/TwoFluid.hpp"
 #include "ThermoVar.hpp"
 #include "Mat.hpp"
 #include <string>
@@ -12,6 +13,7 @@
 namespace outputCFD
 {
     void outputVTK(std::string fileName, const Mesh& mesh, const Field<Compressible>& w, const Field<ThermoVar>& thermoField);
+    void outputVTK(std::string fileName, const Mesh& mesh, const Field<TwoFluid>& u);
 
     //void outputVTK(std::string fileName, const Mesh& mesh, const Field<CompressibleMixture>& w, const Field<ThermoVar>& thermoField);
 

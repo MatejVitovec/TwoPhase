@@ -44,7 +44,7 @@ class Thermo
         virtual Compressible isentropicInlet(double pTot, double TTot, double rhoTot, double sTot, double hTot, Vars<3> velocityDirection, Compressible stateIn, ThermoVar thermoIn) const = 0;
 
         ////// TWOFLUID
-        virtual VolField<TwoFluid> calculateStete(const Field<TwoFluidCompressible>& w, const VolField<TwoFluid>& u) const;
+        virtual void updateFromConservative(VolField<TwoFluid>& u, const Field<TwoFluidCompressible>& w) const;
         virtual void update(Field<TwoFluid>& u) const;
 
         

@@ -7,13 +7,13 @@ class FreeBoundary : public BoundaryCondition
 {
     public:
 
-        FreeBoundary(Boundary meshBoundary) : BoundaryCondition(meshBoundary, FREEBOUNDARY) {}
+        FreeBoundary(Boundary meshBoundary, int id_) : BoundaryCondition(meshBoundary, FREEBOUNDARY, id_) {}
 
         Compressible calculateState(const Compressible& w, const ThermoVar& thermoVar, const Face& f, const Thermo * const thermoModel) const;
 
         CompressibleMixture calculateState(const CompressibleMixture& w, const ThermoVar& thermoVar, const Face& f, const Thermo * const thermoModel) const;
 
-
+        void apply(VolField<TwoFluid>& u, const Mesh& mesh, const Thermo * const thermoModel) const;
 };
 
 #endif // FREEBOUNDARY_HPP

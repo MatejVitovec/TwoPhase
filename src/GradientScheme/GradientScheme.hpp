@@ -8,7 +8,7 @@
 #include "../VolField.hpp"
 #include "../Compressible.hpp"
 #include "../Primitive.hpp"
-#include "../Condensation/CompressibleMixture.hpp"
+#include "../Mixture/CompressibleMixture.hpp"
 #include "../TwoFluid/TwoFluid.hpp"
 
 #include "../Mat.hpp"

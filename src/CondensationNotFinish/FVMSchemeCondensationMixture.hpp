@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 
-#include "Condensation/CompressibleMixture.hpp"
+#include "Mixture/CompressibleMixture.hpp"
 #include "ThermoVar.hpp"
 #include "ComponentThermoVar.hpp"
 #include "Field.hpp"
@@ -20,7 +20,7 @@
 #include "Limiter/Venkatakrishnan.hpp"
 #include "BoundaryCondition/BoundaryCondition.hpp"
 
-#include "Condensation/Mixture.hpp"
+#include "Mixture/Mixture.hpp"
 
 class FVMSchemeCondensationMixture
 {

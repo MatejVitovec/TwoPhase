@@ -2,7 +2,7 @@
 #include "Periodicity.hpp"
 
 
-Periodicity::Periodicity(Boundary meshBoundary, Vars<3> faceMidpointShift_, std::string associatedBoundaryName_, const Mesh& mesh) : BoundaryCondition(meshBoundary, PERIODICITY), faceMidpointShift(faceMidpointShift_), associatedBoundaryName(associatedBoundaryName_)
+Periodicity::Periodicity(Boundary meshBoundary, Vars<3> faceMidpointShift_, std::string associatedBoundaryName_, const Mesh& mesh, int id_) : BoundaryCondition(meshBoundary, PERIODICITY, id_), faceMidpointShift(faceMidpointShift_), associatedBoundaryName(associatedBoundaryName_)
 {
     init(mesh);
 }

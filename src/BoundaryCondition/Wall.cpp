@@ -88,3 +88,43 @@ void Wall::correct(const Field<CompressibleMixture>& w, Field<CompressibleMixtur
         wr[faceIndex] = calculateState(wl[faceIndex], ThermoVar(), faces[faceIndex], thermoModel);
     }
 }
+
+
+
+
+//TWOFLUID
+void Wall::apply(VolField<TwoFluid>& u, const Mesh& mesh, const Thermo * const thermoModel) const
+{
+    const std::vector<Face>& faceList = mesh.getFaceList();
+    const std::vector<int>& ownerIndexList = mesh.getOwnerIndexList();
+
+    std::vector<TwoFluid>& boundaryData = u.boundary(id);
+
+    for (int i = 0; i < boundary.facesIndex.size(); i++)
+    {
+        updateState(boundaryData[i], faceList[i]);    
+    }    
+}
+
+void Wall::updateState(TwoFluid& u, const Face& f) const
+{
+    const Vars<3>& normalVector = f.normalVector;
+
+    Vars<3> ghostVelocityG = u.velocityG() - 2*u.normalVelocityG(normalVector)*normalVector;
+    Vars<3> ghostVelocityL = u.velocityL() - 2*u.normalVelocityL(normalVector)*normalVector;
+
+    u[TwoFluid::U_G] = ghostVelocityG[0];
+    u[TwoFluid::V_G] = ghostVelocityG[1];
+    u[TwoFluid::W_G] = ghostVelocityG[2];
+    u[TwoFluid::U_L] = ghostVelocityL[0];
+    u[TwoFluid::V_L] = ghostVelocityL[1];
+    u[TwoFluid::W_L] = ghostVelocityL[2];
+}
+
+
+
+void Wall::correct(const VolField<TwoFluid>& u, const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const Thermo * const thermoModel) const
+{
+
+}
+

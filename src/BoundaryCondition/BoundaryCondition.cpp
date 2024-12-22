@@ -11,6 +11,24 @@ Boundary BoundaryCondition::getBoundary() const
     return boundary;
 }
 
+void BoundaryCondition::updateMeshBoundary(const Mesh& mesh)
+{
+    const std::vector<Boundary>& boundaryList = mesh.getBoundaryList();
+    for (int i = 0; i < boundaryList.size(); i++)
+    {
+        if(boundary.boundaryConditionName == boundaryList[i].boundaryConditionName)
+        {
+            boundary = boundaryList[i];
+            break;
+        }
+    }
+}
+
+void BoundaryCondition::updateId(int id_)
+{
+    id = id_;
+}
+
 std::vector<Compressible> BoundaryCondition::calc(const VolField<Compressible>& w, const VolField<ThermoVar>& thermoField, const Mesh& mesh, const Thermo * const thermoModel) const
 {
     const std::vector<Face>& faceList = mesh.getFaceList();
@@ -60,28 +78,12 @@ void BoundaryCondition::correct(const Field<Primitive>& u, Field<Primitive>& ul,
 }
 
 
-void BoundaryCondition::updateMeshBoundary(const Mesh& mesh)
-{
-    const std::vector<Boundary>& boundaryList = mesh.getBoundaryList();
-    for (int i = 0; i < boundaryList.size(); i++)
-    {
-        if(boundary.boundaryConditionName == boundaryList[i].boundaryConditionName)
-        {
-            boundary = boundaryList[i];
-            break;
-        }
-    }
-}
-
-
-
-
-void BoundaryCondition::apply(const VolField<TwoFluid>& u, const Mesh& mesh, const Thermo * const thermoModel) const
+void BoundaryCondition::apply(VolField<TwoFluid>& u, const Mesh& mesh, const Thermo * const thermoModel) const
 {
 
 }
 
-void BoundaryCondition::correct(const VolField<TwoFluid>& u, const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const Mesh& mesh, const Thermo * const thermoModel) const
+void BoundaryCondition::correct(const VolField<TwoFluid>& u, const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const Thermo * const thermoModel) const
 {
 
 }

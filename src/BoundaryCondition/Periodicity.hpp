@@ -7,7 +7,7 @@ class Periodicity : public BoundaryCondition
 {
     public:
 
-        Periodicity(Boundary meshBoundary, Vars<3> faceMidpointShift_, std::string associatedBoundaryName_, const Mesh& mesh);
+        Periodicity(Boundary meshBoundary, Vars<3> faceMidpointShift_, std::string associatedBoundaryName_, const Mesh& mesh, int id_);
 
         void init(const Mesh& mesh);
 

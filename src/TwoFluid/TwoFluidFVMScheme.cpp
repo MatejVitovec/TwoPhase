@@ -76,7 +76,7 @@ const Mesh& TwoFluidFVMScheme::getMesh() const
     return mesh;
 }
 
-const Thermo* TwoFluidFVMScheme::getThermoRef()
+const TwoFluidThermo* TwoFluidFVMScheme::getThermoRef()
 {
     return thermo.get();
 }
@@ -88,8 +88,6 @@ void TwoFluidFVMScheme::setInitialConditions(TwoFluidPrimitive initialCondition)
     {
         u[i] = initialCondition;
     }
-
-    //thermo->updateThermoInternal(thermoField, w);  //TODO
 }
 
 void TwoFluidFVMScheme::init()
@@ -236,6 +234,8 @@ void TwoFluidFVMScheme::applyBoundaryConditions()
     {
         boundaryCondition->apply(u, mesh, thermo.get());
     }
+    
+    thermo->updateBoundary(u);
 }
 
 void TwoFluidFVMScheme::boundField()
@@ -289,7 +289,7 @@ void TwoFluidFVMScheme::updateTimeStep()
     for (int i = 0; i < w.size(); i++)
     {
         Vars<3> projectedArea = cells[i].projectedArea;
-        timeSteps[i] = cfl*(cells[i].volume/sum(projectedArea*(abs(u[i].velocityG()) + Vars<3>(u[i].soundSpeedG())))); // pridat vypocet cfl i z liquid zatim pouze z gas phase
+        timeSteps[i] = cfl*(cells[i].volume/sum(projectedArea*(max(abs(u[i].velocityG()), abs(u[i].velocityL())) + Vars<3>(std::max(u[i].soundSpeedG(), u[i].soundSpeedL())))));
         if (timeSteps[i] < 0.0)
         {
             std::cout << "cell index: " << i << std::endl;

@@ -9,7 +9,7 @@ Field<Vars<5>> FluxSolver::calculateFluxes(const Field<Compressible>& wl, const 
     #pragma omp parallel for
     for (int i = 0; i < wl.size(); i++)
     {
-        out[i] = claculateFlux(wl[i], wr[i], thermoFieldL[i], thermoFieldR[i], faceList[i].normalVector)*faceList[i].area;
+        out[i] = calculateFlux(wl[i], wr[i], thermoFieldL[i], thermoFieldR[i], faceList[i].normalVector)*faceList[i].area;
     }
     return out;
 }
@@ -21,7 +21,7 @@ Field<Vars<5>> FluxSolver::calculateFluxes(const Field<Primitive>& ul, const Fie
     #pragma omp parallel for
     for (int i = 0; i < ul.size(); i++)
     {
-        out[i] = claculateFlux(thermoFieldL[i].density(),        thermoFieldR[i].density(),
+        out[i] = calculateFlux(thermoFieldL[i].density(),        thermoFieldR[i].density(),
                                ul[i].velocity(),                 ur[i].velocity(),
                                ul[i].pressure(),                 ur[i].pressure(),
                                thermoFieldL[i].internalEnergy(), thermoFieldR[i].internalEnergy(),
@@ -40,7 +40,7 @@ Field<Vars<9>> FluxSolver::calculateFluxes(const Field<CompressibleMixture>& wl,
     #pragma omp parallel for
     for (int i = 0; i < wl.size(); i++)
     {
-        out[i] = claculateFlux(wl[i], wr[i], thermoFieldL[i], thermoFieldR[i], faceList[i].normalVector)*faceList[i].area;
+        out[i] = calculateFlux(wl[i], wr[i], thermoFieldL[i], thermoFieldR[i], faceList[i].normalVector)*faceList[i].area;
     }
     
     return out;

@@ -17,6 +17,7 @@
 #include "FluxSolver/Hllc.hpp"
 
 #include "Thermo/IdealGasThermo.hpp"
+#include "Thermo/StiffenedGasThermo.hpp"
 #include "Thermo/Iapws95Thermo.hpp"
 #include "Thermo/SpecialGasThermo.hpp"
 #include "Thermo/Iapws95InterpolationThermo.hpp"

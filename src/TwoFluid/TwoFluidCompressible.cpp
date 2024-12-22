@@ -46,16 +46,6 @@ double TwoFluidCompressible::velocityWG() const
     return data[ALPHA_RHO_W_G] / data[ALPHA_RHO_G];
 }
 
-double TwoFluidCompressible::totalEnergyG() const
-{
-    return data[ALPHA_RHO_E_G] / data[ALPHA_RHO_G];
-}
-
-double TwoFluidCompressible::internalEnergyG() const
-{
-    return data[ALPHA_RHO_E_G]/data[ALPHA_RHO_G] - 0.5*this->absVelocity2G();
-}
-
 ///////////////
 
 double TwoFluidCompressible::alphaDensityL() const
@@ -102,17 +92,6 @@ double TwoFluidCompressible::velocityWL() const
 {
     return data[ALPHA_RHO_W_L] / data[ALPHA_RHO_L];
 }
-
-double TwoFluidCompressible::totalEnergyL() const
-{
-    return data[ALPHA_RHO_E_L] / data[ALPHA_RHO_L];
-}
-
-double TwoFluidCompressible::internalEnergyL() const
-{
-    return data[ALPHA_RHO_E_L]/data[ALPHA_RHO_L] - 0.5*this->absVelocity2L();
-}
-
 
 /*Vars<5> TwoFluidCompressible::flux(const Vars<3>& thermoData, const Vars<3>& normalVector) const
 {

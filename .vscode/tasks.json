@@ -19,7 +19,7 @@
 				"Thermo/StateEquations/*.cpp",
 				"Thermo/StateEquations/NonLinearSolver/*.cpp",
 				"Thermo/Interpolation/*.cpp",
-				"Condensation/*.cpp",
+				"Mixture/*.cpp",
 				"GradientScheme/*.cpp",
 				"Limiter/*.cpp",
 				"-o",

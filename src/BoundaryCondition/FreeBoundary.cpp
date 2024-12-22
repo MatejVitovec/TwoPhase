@@ -9,3 +9,8 @@ CompressibleMixture FreeBoundary::calculateState(const CompressibleMixture& w, c
 {
     return w;
 }
+
+void FreeBoundary::apply(VolField<TwoFluid>& u, const Mesh& mesh, const Thermo * const thermoModel) const
+{
+
+}

@@ -1,6 +1,6 @@
 #include "Hllc.hpp"
 
-Vars<5> Hllc::claculateFlux(const double rhoL, const double rhoR,
+Vars<5> Hllc::calculateFlux(const double rhoL, const double rhoR,
                             const Vars<3> uL, const Vars<3> uR,
                             const double pL, const double pR,
                             const double eL, const double eR,
@@ -88,7 +88,7 @@ Vars<5> Hllc::claculateFlux(const double rhoL, const double rhoR,
 }
 
 
-Vars<5> Hllc::claculateFlux(const Compressible& wl, const Compressible& wr, const ThermoVar& thermoL, const ThermoVar& thermoR, const Vars<3>& normalVector) const
+Vars<5> Hllc::calculateFlux(const Compressible& wl, const Compressible& wr, const ThermoVar& thermoL, const ThermoVar& thermoR, const Vars<3>& normalVector) const
 {
     double rhoL = wl.density();
     double pL = thermoL.pressure();
@@ -184,7 +184,7 @@ Vars<5> Hllc::claculateFlux(const Compressible& wl, const Compressible& wr, cons
     }
 }
 
-Vars<9> Hllc::claculateFlux(const CompressibleMixture& wl, const CompressibleMixture& wr, const ThermoVar& thermoL, const ThermoVar& thermoR, const Vars<3>& normalVector) const
+Vars<9> Hllc::calculateFlux(const CompressibleMixture& wl, const CompressibleMixture& wr, const ThermoVar& thermoL, const ThermoVar& thermoR, const Vars<3>& normalVector) const
 {
     double rhoL = wl.density();
     double pL = thermoL.pressure();

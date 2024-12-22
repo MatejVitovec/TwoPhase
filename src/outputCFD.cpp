@@ -116,6 +116,97 @@ void outputCFD::outputVTK(std::string fileName, const Mesh& mesh, const Field<Co
 	f.close();
 }
 
+void outputVTK(std::string fileName, const Mesh& mesh, const Field<TwoFluid>& u)
+{
+	const std::vector<Vars<3>>& nodeList = mesh.getNodeList();
+    const std::vector<Cell>& cellList = mesh.getCellList();
+
+    int cellSize = mesh.getCellsSize();
+
+	std::ofstream f;
+	f.open(fileName, std::ios::out);
+	
+	f << "# vtk DataFile Version 1.0\n";
+	f << "unstructured grid\n";
+	f << "ascii\n";
+	f << "DATASET UNSTRUCTURED_GRID\n";
+	
+	f << "points " << mesh.getNodesSize() << " float\n";
+	
+	for (int i = 0; i < mesh.getNodesSize(); i++)
+    {
+		f << nodeList[i] << "\n";
+	}
+	
+	f << "cells " << cellSize << " " << calculateCellNodeSize(mesh) << "\n";
+	
+	for (int i = 0; i < cellSize; i++)
+    {
+		f << cellList[i] << "\n";
+	}
+	
+	f << "cell_types " << cellSize << "\n";
+	
+	for (int i = 0; i < cellSize; i++)
+    {
+		f << cellList[i].getVtkType() << "\n";
+	}
+	
+	f << "CELL_DATA " << cellSize << "\n";
+ 	f << "SCALARS rhoG float\n"; 
+	f << "LOOKUP_TABLE default\n";
+
+    for (int i = 0; i < cellSize; i++)
+    {
+		f << roundToZero(u[i].densityG()) << "\n";
+	}
+
+	//f << "VECTORS u float\n"; 
+ 	f << "SCALARS UG float 3\n"; 
+	f << "LOOKUP_TABLE default\n";
+
+    for (int i = 0; i < cellSize; i++)
+    {
+		f << roundToZero(u[i].velocityUG()) << " " << roundToZero(u[i].velocityVG()) << " " << roundToZero(u[i].velocityWG()) << "\n";
+	}	
+
+ 	f << "SCALARS eG float\n"; 
+	f << "LOOKUP_TABLE default\n";
+
+    for (int i = 0; i < cellSize; i++)
+    {
+		f << roundToZero(u[i].internalEnergyG()) << "\n";
+	}
+	
+	f << "SCALARS p float\n"; 
+	f << "LOOKUP_TABLE default\n";
+
+    for (int i = 0; i < cellSize; i++)
+    {
+		f << roundToZero(u[i].pressure()) << "\n";
+	}
+
+	f << "SCALARS MG float\n"; 
+	f << "LOOKUP_TABLE default\n";
+
+    for (int i = 0; i < cellSize; i++)
+    {
+		f << roundToZero(u[i].absVelocityG()/u[i].soundSpeedG()) << "\n";
+	}
+
+	f << "SCALARS TG float\n"; 
+	f << "LOOKUP_TABLE default\n";
+
+    for (int i = 0; i < cellSize; i++)
+    {
+		f << roundToZero(u[i].temperatureG()) << "\n";
+	}
+	
+	f << std::endl;
+
+	f.close();
+}
+
 
 /*void outputCFD::outputVTK(std::string fileName, const Mesh& mesh, const Field<CompressibleMixture> w, const Field<ThermoVar>& thermoField)
 {

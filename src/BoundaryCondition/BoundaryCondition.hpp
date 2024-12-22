@@ -10,25 +10,28 @@
 #include "../ThermoVar.hpp"
 #include "../Field.hpp"
 #include "../VolField.hpp"
-#include "../TwoFluid/TwoFluid.hpp"
+
 
 #include "../Mat.hpp"
 #include "../Thermo/Thermo.hpp"
 
-#include "../Condensation/CompressibleMixture.hpp"
+#include "../Mixture/CompressibleMixture.hpp"
+#include "../TwoFluid/TwoFluid.hpp"
 
 class BoundaryCondition
 {
     public:
         enum BoundaryConditionType{ISENTROPICINLET, PRESSUREOUTLET, FREEBOUNDARY, WALL, PERIODICITY, MEANPRESSUREOUTLET};
 
-        BoundaryCondition(BoundaryConditionType type_) : type(type_) {}
-        BoundaryCondition(Boundary meshBoundary, BoundaryConditionType type_) : boundary(meshBoundary), type(type_) {}
+        BoundaryCondition(BoundaryConditionType type_) : type(type_) , id(0) {}
+        BoundaryCondition(Boundary meshBoundary, BoundaryConditionType type_, int id_) : boundary(meshBoundary), type(type_), id(id_) {}
 
         BoundaryConditionType getType() const;
         Boundary getBoundary() const;
 
         void updateMeshBoundary(const Mesh& mesh);
+
+        void updateId(int id_);
 
         virtual Compressible calculateState(const Compressible& w, const ThermoVar& thermoVar, const Face& f, const Thermo * const thermoModel) const = 0;
         virtual CompressibleMixture calculateState(const CompressibleMixture& w, const ThermoVar& thermoVar, const Face& f, const Thermo * const thermoModel) const = 0;
@@ -50,13 +53,14 @@ class BoundaryCondition
                              const Mesh& mesh, const Thermo * const thermoModel) const;
         
         //Jina implementace pro TWOFLUID kdyz se osvetsi predelat i pro zbytek
-        virtual void apply(const VolField<TwoFluid>& u, const Mesh& mesh, const Thermo * const thermoModel) const;
+        virtual void apply(VolField<TwoFluid>& u, const Mesh& mesh, const Thermo * const thermoModel) const;
         virtual void correct(const VolField<TwoFluid>& u, const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const Thermo * const thermoModel) const; 
 
 
     protected:
         Boundary boundary;
         BoundaryConditionType type;
+        int id;
 };
 
 #endif // BOUNDARYCONDITION_HPP

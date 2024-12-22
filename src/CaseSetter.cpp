@@ -381,7 +381,7 @@ std::vector<std::shared_ptr<BoundaryCondition>> CaseSetter::createBoundaryCondit
 
             if(pressure != "")
             {
-                out[boundaryId] = std::make_shared<PressureOutlet>(auxBoundary, std::stod(pressure));
+                out[boundaryId] = std::make_shared<PressureOutlet>(auxBoundary, std::stod(pressure), boundaryId);
             }
             else { errorMessage("spatne zadane parametry BC"); }
         }
@@ -391,13 +391,13 @@ std::vector<std::shared_ptr<BoundaryCondition>> CaseSetter::createBoundaryCondit
 
             if(pressure != "")
             {
-                out[boundaryId] = std::make_shared<MeanPressureOutlet>(auxBoundary, std::stod(pressure));
+                out[boundaryId] = std::make_shared<MeanPressureOutlet>(auxBoundary, std::stod(pressure), boundaryId);
             }
             else { errorMessage("spatne zadane parametry BC"); }
         }
         else if (type == "wall")
         {
-            out[boundaryId] = std::make_shared<Wall>(auxBoundary);
+            out[boundaryId] = std::make_shared<Wall>(auxBoundary, boundaryId);
         }
         else if (type == "periodicity")
         {
@@ -405,22 +405,22 @@ std::vector<std::shared_ptr<BoundaryCondition>> CaseSetter::createBoundaryCondit
 
             if(shiftArray.size() == 3)
             {
-                out[boundaryId] = std::make_shared<Periodicity>(auxBoundary, Vars<3>({shiftArray[0], shiftArray[1], shiftArray[2]}), "000", mesh);
+                out[boundaryId] = std::make_shared<Periodicity>(auxBoundary, Vars<3>({shiftArray[0], shiftArray[1], shiftArray[2]}), "000", mesh, boundaryId);
             }
             else { errorMessage("spatne zadane parametry BC"); }
         }
         else if (type == "symmetry")
         {
-            out[boundaryId] = std::make_shared<Wall>(auxBoundary);
+            out[boundaryId] = std::make_shared<Wall>(auxBoundary, boundaryId);
         }
         else if (type == "free")
         {
-            out[boundaryId] = std::make_shared<FreeBoundary>(auxBoundary);
+            out[boundaryId] = std::make_shared<FreeBoundary>(auxBoundary, boundaryId);
         }
         else
         {
             errorMessage("chyba v zadani okrajove podmink");
-            out[boundaryId] = std::make_shared<FreeBoundary>(auxBoundary);
+            out[boundaryId] = std::make_shared<FreeBoundary>(auxBoundary, boundaryId);
         }        
     }
 

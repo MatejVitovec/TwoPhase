@@ -19,7 +19,7 @@ class NewtonMethod
                                         double guess1, double guess2) const;
 
     private:
-        static constexpr double numTol = 0.0001;
+        static constexpr double numTol = 0.00001;
 
 };
 
