@@ -169,45 +169,45 @@ double Gibbs::sFunc(double pi, double tau) const
 
 double Gibbs::hFunc(double pi, double tau) const
 {
-    specGasConst*reducedT*(gamma0t(pi, tau) + gammart(pi, tau));
+    return specGasConst*reducedT*(gamma0t(pi, tau) + gammart(pi, tau));
 }
 
 double Gibbs::vDPiFunc(double pi, double tau) const
 {
-    
+    return 0.0; // TODO
 }
 
 double Gibbs::eDPiFunc(double pi, double tau) const
 {
-    
+    return 0.0; // TODO
 }
 
 double Gibbs::sDPiFunc(double pi, double tau) const
 {
-    
+    return 0.0; // TODO
 }
 
 double Gibbs::hDPiFunc(double pi, double tau) const
 {
-    
+    return 0.0; // TODO
 }
 
 double Gibbs::vDTauFunc(double pi, double tau) const
 {
-    
+    return 0.0; // TODO
 }
 
 double Gibbs::eDTauFunc(double pi, double tau) const
 {
-    
+    return 0.0; // TODO
 }
 
 double Gibbs::sDTauFunc(double pi, double tau) const
 {
-    
+    return 0.0; // TODO
 }
 
 double Gibbs::hDTauFunc(double pi, double tau) const
 {
-    
+    return 0.0; // TODO
 }

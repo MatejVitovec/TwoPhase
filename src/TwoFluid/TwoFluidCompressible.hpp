@@ -4,7 +4,8 @@
 #include <vector>
 #include <memory>
 
-#include "Vars.hpp"
+#include "../Vars.hpp"
+#include "TwoFluid.hpp"
 
 class TwoFluidCompressible : public Vars<10>
 {
@@ -17,9 +18,12 @@ class TwoFluidCompressible : public Vars<10>
         TwoFluidCompressible() : Vars<10>() {}
         TwoFluidCompressible(const Vars<10>& varsIn) : Vars<10>(varsIn) {}
         TwoFluidCompressible(const std::array<double, 10>& in) : Vars<10>(in) {}
+        TwoFluidCompressible(const TwoFluid& u);
         //TwoFluidCompressible(const std::array<double, 5>& inRef ) : 
 
         virtual ~TwoFluidCompressible() {}
+
+        void updateInterfacialPressure(const double pInt, const TwoFluid& u);
 
         double alphaDensityG() const;
         double densityG(double alpha);

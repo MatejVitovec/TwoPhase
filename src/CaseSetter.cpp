@@ -371,7 +371,8 @@ std::vector<std::shared_ptr<BoundaryCondition>> CaseSetter::createBoundaryCondit
                                                                 TTot,
                                                                 state[1],
                                                                 state[2],
-                                                                angleAngleToUnit(std::stod(xyAngle), std::stod(xzAngle)));
+                                                                angleAngleToUnit(std::stod(xyAngle), std::stod(xzAngle)),
+                                                                boundaryId);
             }
             else { errorMessage("spatne zadane parametry BC"); }
         }

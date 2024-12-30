@@ -29,6 +29,9 @@ class TwoFluid : public TwoFluidPrimitive
         double soundSpeedG() const;
         double soundSpeedL() const;
 
+        double totalEnergyG() const;
+        double totalEnergyL() const;
+
         double interfacialPressure() const;
         void blend();
 
@@ -37,8 +40,8 @@ class TwoFluid : public TwoFluidPrimitive
 
     private:
 
-        static constexpr double epsilonMin = 0.00001;
-        static constexpr double epsilonMax = 0.1;
+        static constexpr double epsilonMin = 0.1e-8;
+        static constexpr double epsilonMax = 0.1e-4;
 
         std::array<double, 6> thermoData;
 };

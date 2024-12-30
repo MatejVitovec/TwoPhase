@@ -49,7 +49,7 @@ class Gibbs
 
         virtual double gamma0(double pi, double tau) const = 0;
         virtual double gamma0p(double pi, double tau) const = 0;
-        virtual double gamma0p(double pi, double tau) const = 0;
+        virtual double gamma0pp(double pi, double tau) const = 0;
         virtual double gamma0t(double pi, double tau) const = 0;
         virtual double gamma0tt(double pi, double tau) const = 0;
         virtual double gamma0pt(double pi, double tau) const = 0;

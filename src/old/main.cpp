@@ -24,7 +24,7 @@ int main(int argc, char** argv)
     feenableexcept(FE_INVALID | FE_OVERFLOW);
 
     Mesh tempMesh = Mesh();
-    tempMesh.loadGmsh2("../results/TwoFluid/test1.msh");
+    tempMesh.loadGmsh2("../meshes/riemannMesh.msh");
 
 
     std::unique_ptr<TwoFluidFVMScheme> solver = std::make_unique<Explicit>(std::move(tempMesh), std::make_unique<TwoFluidFlux>(), std::make_unique<StiffenedGasThermo>());

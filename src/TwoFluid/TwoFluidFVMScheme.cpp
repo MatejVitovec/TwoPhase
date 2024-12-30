@@ -3,9 +3,7 @@
 #include <algorithm>
 #include "TwoFluidFVMScheme.hpp"
 
-#include "BoundaryCondition/Periodicity.hpp"
-
-#include "outputCFD.hpp"
+#include "../outputCFD.hpp"
 
 void TwoFluidFVMScheme::setReconstructionGradient(std::unique_ptr<GradientScheme> gradScheme_)
 {
@@ -90,28 +88,46 @@ void TwoFluidFVMScheme::setInitialConditions(TwoFluidPrimitive initialCondition)
     }
 }
 
+void TwoFluidFVMScheme::setInitialConditions(const Field<TwoFluidPrimitive>& initialCondition)
+{
+    for (int i = 0; i < mesh.getCellsSize(); i++)
+    {
+        u[i] = initialCondition[i];
+    }
+}
+
 void TwoFluidFVMScheme::init()
 {
     applyFreeBoundaryCondition(); // presenout do CaseSetter, pote mouno zredukovat tuto init() funkci
 
     gradientScheme->init(mesh, boundaryConditionList);
 
-    //w.getBoundaryData() = std::vector<std::vector<Compressible>>(boundaryConditionList.size());
     u.getBoundaryData() = std::vector<std::vector<TwoFluid>>(boundaryConditionList.size());
 
+    thermo->updateInternal(u);
+
+    for (int i = 0; i < u.size(); i++)
+    {
+        w[i] = u[i];
+    }
+    
     ul = Field<TwoFluid>(mesh.getFacesSize());
     ur = Field<TwoFluid>(mesh.getFacesSize());
 
+    fluxesl = Field<Vars<10>>(mesh.getFacesSize());
+    fluxesr = Field<Vars<10>>(mesh.getFacesSize());
+
     grad = Field<Mat<10,3>>(mesh.getCellsSize());
     phi = Field<Vars<10>>(mesh.getCellsSize());
+
+    timeSteps = Field<double>(mesh.getCellsSize());
+    pInt = Field<double>(mesh.getCellsSize());
 
     for (int boundaryId = 0; boundaryId < boundaryConditionList.size(); boundaryId++)
     {
         int size = boundaryConditionList[boundaryId]->getBoundary().facesIndex.size();
         u.boundary(boundaryId) = std::vector<TwoFluid>(size);
     }    
-
-    timeSteps = Field<double>(mesh.getCellsSize());
 
     fixGradient = 1000000;
     fixedGradStep = 10000000;
@@ -238,6 +254,25 @@ void TwoFluidFVMScheme::applyBoundaryConditions()
     thermo->updateBoundary(u);
 }
 
+Field<double> TwoFluidFVMScheme::calculateInterfacialPressure()
+{
+    Field<double> out(u.size());
+    for (int i = 0; i < u.size(); i++)
+    {
+        out[i] = u[i].interfacialPressure();
+    }
+    
+    return out;
+}
+
+void TwoFluidFVMScheme::updateInterfacialPressureInConservative()
+{
+    for (int i = 0; i < w.size(); i++)
+    {
+        w[i].updateInterfacialPressure(pInt[i], u[i]);
+    }
+}
+
 void TwoFluidFVMScheme::boundField()
 {
     /*constexpr double minDensity = 0.1;
@@ -282,6 +317,14 @@ void TwoFluidFVMScheme::boundField()
     }*/
 }
 
+void TwoFluidFVMScheme::blend()
+{
+    for (int i = 0; i < u.size(); i++)
+    {
+        u[i].blend();
+    }
+}
+
 void TwoFluidFVMScheme::updateTimeStep()
 {
     const std::vector<Cell>& cells = mesh.getCellList();
@@ -305,11 +348,6 @@ void TwoFluidFVMScheme::updateTimeStep()
     }
 }
 
-void TwoFluidFVMScheme::calculateFluxes()
-{
-    fluxes = fluxSolver->calculateFluxes(ul, ur, mesh.getFaceList());
-}
-
 Field<Vars<10>> TwoFluidFVMScheme::calculateResidual()
 {
     const std::vector<Cell>& cells = mesh.getCellList();
@@ -321,13 +359,40 @@ Field<Vars<10>> TwoFluidFVMScheme::calculateResidual()
 
     for (int i = 0; i < faces.size(); i++)
     {
-        int owner = owners[i];
-        int neighbor = neighbors[i];
+        const int owner = owners[i];
+        const int neighbor = neighbors[i];
         
-        res[owner] -= fluxes[i];
+        res[owner] -= fluxesl[i];
         if (neighbor >= 0)
         {
-            res[neighbor] += fluxes[i];
+            res[neighbor] += fluxesr[i]; //TODO overit jestli jsou pouzite spravne toky
+        }
+    }
+
+    for (int i = 0; i < faces.size(); i++)
+    {
+        const int owner = owners[i];
+        const int neighbor = neighbors[i];
+
+        const Vars<3> normal = faces[i].area*faces[i].normalVector;
+        
+        res[owner][TwoFluid::U_G] += pInt[owner]*ul[i].alphaG()*normal[0];
+        res[owner][TwoFluid::V_G] += pInt[owner]*ul[i].alphaG()*normal[1];
+        res[owner][TwoFluid::W_G] += pInt[owner]*ul[i].alphaG()*normal[2];
+
+        res[owner][TwoFluid::U_L] += pInt[owner]*ul[i].alphaL()*normal[0];
+        res[owner][TwoFluid::V_L] += pInt[owner]*ul[i].alphaL()*normal[1];
+        res[owner][TwoFluid::W_L] += pInt[owner]*ul[i].alphaL()*normal[2];
+
+        if (neighbor >= 0)
+        {
+            res[neighbor][TwoFluid::U_G] -= pInt[neighbor]*ur[i].alphaG()*normal[0];
+            res[neighbor][TwoFluid::V_G] -= pInt[neighbor]*ur[i].alphaG()*normal[1];
+            res[neighbor][TwoFluid::W_G] -= pInt[neighbor]*ur[i].alphaG()*normal[2];
+
+            res[neighbor][TwoFluid::U_L] -= pInt[neighbor]*ur[i].alphaL()*normal[0];
+            res[neighbor][TwoFluid::V_L] -= pInt[neighbor]*ur[i].alphaL()*normal[1];
+            res[neighbor][TwoFluid::W_L] -= pInt[neighbor]*ur[i].alphaL()*normal[2];
         }
     }
 

@@ -1,6 +1,29 @@
 #include <cmath>
 #include "TwoFluidCompressible.hpp"
 
+TwoFluidCompressible::TwoFluidCompressible(const TwoFluid& u) : Vars<10>()
+{
+    const double pInt = u.interfacialPressure();
+
+    data[ALPHA_RHO_G]        = u.alphaG()*u.densityG();
+    data[ALPHA_RHO_U_G]      = u.alphaG()*u.densityG()*u.velocityUG();
+    data[ALPHA_RHO_V_G]      = u.alphaG()*u.densityG()*u.velocityVG();
+    data[ALPHA_RHO_W_G]      = u.alphaG()*u.densityG()*u.velocityWG();
+    data[ALPHA_RHO_E_PINT_G] = u.alphaG()*(u.densityG()*u.totalEnergyG() + pInt);
+
+    data[ALPHA_RHO_L]        = u.alphaL()*u.densityL();
+    data[ALPHA_RHO_U_L]      = u.alphaL()*u.densityL()*u.velocityUL();
+    data[ALPHA_RHO_V_L]      = u.alphaL()*u.densityL()*u.velocityVL();
+    data[ALPHA_RHO_W_L]      = u.alphaL()*u.densityL()*u.velocityWL();
+    data[ALPHA_RHO_E_PINT_L] = u.alphaL()*(u.densityL()*u.totalEnergyL() + pInt);
+}
+
+void TwoFluidCompressible::updateInterfacialPressure(const double pInt, const TwoFluid& u)
+{
+    data[ALPHA_RHO_E_PINT_G] = u.alphaG()*(u.densityG()*u.totalEnergyG() + pInt);
+    data[ALPHA_RHO_E_PINT_L] = u.alphaL()*(u.densityL()*u.totalEnergyL() + pInt);
+}
+
 double TwoFluidCompressible::alphaDensityG() const
 {
     return data[ALPHA_RHO_G];

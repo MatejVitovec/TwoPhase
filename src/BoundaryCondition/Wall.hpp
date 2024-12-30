@@ -18,10 +18,10 @@ class Wall : public BoundaryCondition
         void correct(const Field<CompressibleMixture>& w, Field<CompressibleMixture>& wl, Field<CompressibleMixture>& wr, const Field<Mat<9,3>>& grad, const Field<Vars<9>>& phi, const Mesh& mesh, const Thermo * const thermoModel) const;
 
         //TWOFLUID
-        void apply(VolField<TwoFluid>& u, const Mesh& mesh, const Thermo * const thermoModel) const;
-        void correct(const VolField<TwoFluid>& u, const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const Thermo * const thermoModel) const; 
+        void apply(VolField<TwoFluid>& u, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const;
+        void correct(const VolField<TwoFluid>& u, const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const; 
 
-        void updateState(TwoFluid& u, const Face& f) const;
+        void updateState(const TwoFluid& steteIn, const Face& f, TwoFluid& u) const;
 
     private:
 

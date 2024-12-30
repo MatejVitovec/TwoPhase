@@ -17,6 +17,7 @@
 
 #include "../Mixture/CompressibleMixture.hpp"
 #include "../TwoFluid/TwoFluid.hpp"
+#include "../TwoFluid/TwoFluidThermo/TwoFluidThermo.hpp"
 
 class BoundaryCondition
 {
@@ -53,8 +54,8 @@ class BoundaryCondition
                              const Mesh& mesh, const Thermo * const thermoModel) const;
         
         //Jina implementace pro TWOFLUID kdyz se osvetsi predelat i pro zbytek
-        virtual void apply(VolField<TwoFluid>& u, const Mesh& mesh, const Thermo * const thermoModel) const;
-        virtual void correct(const VolField<TwoFluid>& u, const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const Thermo * const thermoModel) const; 
+        virtual void apply(VolField<TwoFluid>& u, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const;
+        virtual void correct(const VolField<TwoFluid>& u, const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const; 
 
 
     protected:

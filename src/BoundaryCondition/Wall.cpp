@@ -93,25 +93,27 @@ void Wall::correct(const Field<CompressibleMixture>& w, Field<CompressibleMixtur
 
 
 //TWOFLUID
-void Wall::apply(VolField<TwoFluid>& u, const Mesh& mesh, const Thermo * const thermoModel) const
+void Wall::apply(VolField<TwoFluid>& u, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const
 {
     const std::vector<Face>& faceList = mesh.getFaceList();
     const std::vector<int>& ownerIndexList = mesh.getOwnerIndexList();
 
     std::vector<TwoFluid>& boundaryData = u.boundary(id);
 
-    for (int i = 0; i < boundary.facesIndex.size(); i++)
+    for (int i = 0; i < boundary.facesIndex.size(); i++) //Predelat - zbavid se boundary.facesIndex a nahradit indexem boundaryId a boundaryFaceList nahrat z meshe
     {
-        updateState(boundaryData[i], faceList[i]);    
+        updateState(u[ownerIndexList[boundary.facesIndex[i]]], faceList[boundary.facesIndex[i]], boundaryData[i]);    
     }    
 }
 
-void Wall::updateState(TwoFluid& u, const Face& f) const
+void Wall::updateState(const TwoFluid& steteIn, const Face& f, TwoFluid& u) const
 {
     const Vars<3>& normalVector = f.normalVector;
 
-    Vars<3> ghostVelocityG = u.velocityG() - 2*u.normalVelocityG(normalVector)*normalVector;
-    Vars<3> ghostVelocityL = u.velocityL() - 2*u.normalVelocityL(normalVector)*normalVector;
+    u = steteIn;
+
+    Vars<3> ghostVelocityG = steteIn.velocityG() - 2*steteIn.normalVelocityG(normalVector)*normalVector;
+    Vars<3> ghostVelocityL = steteIn.velocityL() - 2*steteIn.normalVelocityL(normalVector)*normalVector;
 
     u[TwoFluid::U_G] = ghostVelocityG[0];
     u[TwoFluid::V_G] = ghostVelocityG[1];
@@ -123,7 +125,7 @@ void Wall::updateState(TwoFluid& u, const Face& f) const
 
 
 
-void Wall::correct(const VolField<TwoFluid>& u, const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const Thermo * const thermoModel) const
+void Wall::correct(const VolField<TwoFluid>& u, const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const
 {
 
 }

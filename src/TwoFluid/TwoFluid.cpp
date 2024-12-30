@@ -31,6 +31,16 @@ double TwoFluid::soundSpeedL() const
     return thermoData[A_L];
 }
 
+double TwoFluid::totalEnergyG() const
+{
+    return thermoData[INT_E_G] + 0.5*norm2(this->velocityG());
+}
+
+double TwoFluid::totalEnergyL() const
+{
+    return thermoData[INT_E_L] + 0.5*norm2(this->velocityL());
+}
+
 double TwoFluid::interfacialPressure() const
 {
     constexpr double sigma = 2.0;
@@ -39,7 +49,7 @@ double TwoFluid::interfacialPressure() const
     double pInt = sigma*((data[ALPHA]*thermoData[RHO_G]*(1.0 - data[ALPHA])*thermoData[RHO_L])
         /(data[ALPHA]*thermoData[RHO_L] + (1.0 - data[ALPHA])*thermoData[RHO_G]))*norm2(this->velocityG() - this->velocityL()); //NUTNO OVERTIT
 
-    return std::min(pInt, epsilonP*data[P]);
+    return data[P] - std::min(pInt, epsilonP*data[P]); //pInt = p - deltaP* (ve clanku "stratified model" od Lia je to pInt = deltaP*)
 }
 
 void TwoFluid::blend()

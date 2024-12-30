@@ -116,7 +116,8 @@ void outputCFD::outputVTK(std::string fileName, const Mesh& mesh, const Field<Co
 	f.close();
 }
 
-void outputVTK(std::string fileName, const Mesh& mesh, const Field<TwoFluid>& u)
+
+void outputCFD::outputVTK(std::string fileName, const Mesh& mesh, const Field<TwoFluid>& u)
 {
 	const std::vector<Vars<3>>& nodeList = mesh.getNodeList();
     const std::vector<Cell>& cellList = mesh.getCellList();
@@ -191,7 +192,14 @@ void outputVTK(std::string fileName, const Mesh& mesh, const Field<TwoFluid>& u)
 
     for (int i = 0; i < cellSize; i++)
     {
-		f << roundToZero(u[i].absVelocityG()/u[i].soundSpeedG()) << "\n";
+		if (u[i].absVelocityG() == 0.0)
+		{
+			f << 0.0 << "\n";
+		}
+		else
+		{		
+			f << roundToZero(u[i].absVelocityG()/u[i].soundSpeedG()) << "\n";
+		}
 	}
 
 	f << "SCALARS TG float\n"; 
@@ -200,6 +208,14 @@ void outputVTK(std::string fileName, const Mesh& mesh, const Field<TwoFluid>& u)
     for (int i = 0; i < cellSize; i++)
     {
 		f << roundToZero(u[i].temperatureG()) << "\n";
+	}
+
+	f << "SCALARS alpha float\n"; 
+	f << "LOOKUP_TABLE default\n";
+
+    for (int i = 0; i < cellSize; i++)
+    {
+		f << roundToZero(u[i].alpha()) << "\n";
 	}
 	
 	f << std::endl;

@@ -10,7 +10,7 @@
 #include "../Field.hpp"
 #include "../VolField.hpp"
 #include "../Mesh/Mesh.hpp"
-#include "TwoFluidFlux/TwoFluidFlux.hpp"
+#include "TwoFluidFlux/TwoFluidFluxSolver.hpp"
 #include "TwoFluidThermo/TwoFluidThermo.hpp"
 #include "../GradientScheme/GradientScheme.hpp"
 #include "../Limiter/Limiter.hpp"
@@ -26,7 +26,7 @@ class TwoFluidFVMScheme
 {
     public:
 
-        TwoFluidFVMScheme(Mesh&& mesh_, std::unique_ptr<TwoFluidFlux> fluxSolver_, std::unique_ptr<TwoFluidThermo> thermo_) : mesh(std::move(mesh_)),
+        TwoFluidFVMScheme(Mesh&& mesh_, std::unique_ptr<TwoFluidFluxSolver> fluxSolver_, std::unique_ptr<TwoFluidThermo> thermo_) : mesh(std::move(mesh_)),
             fluxSolver(std::move(fluxSolver_)),
             thermo(std::move(thermo_)),
             w(Field<TwoFluidCompressible>(mesh.getCellsSize())),
@@ -67,6 +67,7 @@ class TwoFluidFVMScheme
         const TwoFluidThermo* getThermoRef();
 
         void setInitialConditions(TwoFluidPrimitive initialCondition);
+        void setInitialConditions(const Field<TwoFluidPrimitive>& initialCondition);
 
         void setBoundaryConditions(std::vector<std::shared_ptr<BoundaryCondition>> boundaryConditions);
         void applyFreeBoundaryCondition();
@@ -78,7 +79,7 @@ class TwoFluidFVMScheme
         
         
     protected:
-        std::unique_ptr<TwoFluidFlux> fluxSolver;
+        std::unique_ptr<TwoFluidFluxSolver> fluxSolver;
         std::unique_ptr<TwoFluidThermo> thermo;
         std::unique_ptr<GradientScheme> gradientScheme;
         std::unique_ptr<Limiter> limiter;
@@ -92,10 +93,13 @@ class TwoFluidFVMScheme
         Field<TwoFluid> ul; //faces size
         Field<TwoFluid> ur;
 
-        Field<Vars<10>> fluxes;
+        Field<Vars<10>> fluxesl;
+        Field<Vars<10>> fluxesr;
 
         Field<Mat<10,3>> grad;
         Field<Vars<10>> phi;
+
+        
 
         double cfl;
         int maxIter;
@@ -109,6 +113,7 @@ class TwoFluidFVMScheme
         int fixedGradStep;
 
         Field<double> timeSteps;
+        Field<double> pInt;
 
         double time;
         int iter;
@@ -116,9 +121,11 @@ class TwoFluidFVMScheme
         void updateTimeStep();
         void interpolateToFaces();
         void applyBoundaryConditions(); //drive se jmenovalo calcBoundaryConditionFields()
-        void calculateFluxes();
         Field<Vars<10>> calculateResidual();
+        Field<double> calculateInterfacialPressure();
+        void updateInterfacialPressureInConservative();
         void boundField();
+        void blend();
 
     private:
 

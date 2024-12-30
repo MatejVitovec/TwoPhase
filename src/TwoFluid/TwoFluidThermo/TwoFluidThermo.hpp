@@ -26,6 +26,7 @@ class TwoFluidThermo
         
         virtual void update(VolField<TwoFluid>& u) const;
         virtual void update(Field<TwoFluid>& u) const;
+        virtual void updateInternal(Field<TwoFluid>& u) const;
         virtual void updateBoundary(VolField<TwoFluid>& u) const;
 
     private:
@@ -34,14 +35,14 @@ class TwoFluidThermo
 
         NewtonMethod newton;
 
-        const double gammaG = 1.0;
-        const double gammaL = 1.0;
+        const double gammaG = 1.4;
+        const double gammaL = 2.8;
 
-        const double cpG = 1.0;
-        const double cpL = 1.0;
+        const double cpG = 1004.5;
+        const double cpL = 4186.0;
 
-        const double pInfG = 1.0;
-        const double pInfL = 1.0;
+        const double pInfG = 0.0;
+        const double pInfL = 8.5e8;
 };
 
 #endif // TWOFLUIDTHERMO_HPP

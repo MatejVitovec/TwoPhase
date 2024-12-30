@@ -1,15 +1,15 @@
 #include "Explicit.hpp"
 #include <iostream>
-#include "outputCFD.hpp"
+#include "../outputCFD.hpp"
 
-#include "VolField.hpp"
+#include "../VolField.hpp"
 
 
 void Explicit::solve()
 {
     init();
 
-    thermo->update(u);
+    outputCFD::outputVTK(savePath + "/results/results." + std::to_string(0) + ".vtk", mesh, u);
 
     iter = 0;
 
@@ -17,7 +17,7 @@ void Explicit::solve()
 
     Vars<10> resNorm;
 
-    Field<double> pInt(u.size());
+    //Field<double> pInt(u.size());
 
     auto startAll = std::chrono::high_resolution_clock::now();
 
@@ -31,16 +31,20 @@ void Explicit::solve()
 
         applyBoundaryConditions();
 
+        pInt = calculateInterfacialPressure();
+        updateInterfacialPressureInConservative();
+
         interpolateToFaces();
 
-        calculateFluxes();
+        fluxSolver->calculateFluxes(ul, ur, mesh.getFaceList(), fluxesl, fluxesr);
 
         Field<Vars<10>> res = calculateResidual();
 
         w += res*timeSteps;
 
         thermo->updateFromConservative(u, w, pInt);
-
+        blend();
+        thermo->update(u);
 
         if(iter % 100 == 0)
         {
