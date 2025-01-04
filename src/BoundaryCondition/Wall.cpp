@@ -115,12 +115,12 @@ void Wall::updateState(const TwoFluid& steteIn, const Face& f, TwoFluid& u) cons
     Vars<3> ghostVelocityG = steteIn.velocityG() - 2*steteIn.normalVelocityG(normalVector)*normalVector;
     Vars<3> ghostVelocityL = steteIn.velocityL() - 2*steteIn.normalVelocityL(normalVector)*normalVector;
 
-    u[TwoFluid::U_G] = ghostVelocityG[0];
+    /*u[TwoFluid::U_G] = ghostVelocityG[0];
     u[TwoFluid::V_G] = ghostVelocityG[1];
     u[TwoFluid::W_G] = ghostVelocityG[2];
     u[TwoFluid::U_L] = ghostVelocityL[0];
     u[TwoFluid::V_L] = ghostVelocityL[1];
-    u[TwoFluid::W_L] = ghostVelocityL[2];
+    u[TwoFluid::W_L] = ghostVelocityL[2]; - VYPNUTO Z DUVODU POUZITI V RIEMANN SOLVERU*/
 }
 
 

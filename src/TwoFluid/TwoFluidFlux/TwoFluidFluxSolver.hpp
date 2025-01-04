@@ -17,7 +17,7 @@ class TwoFluidFluxSolver
 
         virtual void calculateFlux(const double alphaL, const double alphaR,
             const double rhoL, const double rhoR,
-            const Vars<3> uL, const Vars<3> uR,
+            const Vars<3>& uL, const Vars<3>& uR,
             const double pL, const double pR,
             const double eL, const double eR,
             const double aL, const double aR,

@@ -4,19 +4,19 @@
 
 
 void TwoFluidSlau2::calculateFlux(const double alphaL, const double alphaR,
-                                     const double rhoL, const double rhoR,
-                                     const Vars<3> uL, const Vars<3> uR,
-                                     const double pL, const double pR,
-                                     const double eL, const double eR,
-                                     const double aL, const double aR,
-                                     const Vars<3>& normalVector,
-                                     Vars<5>& fluxL, Vars<5>& fluxR)
+                                  const double rhoL, const double rhoR,
+                                  const Vars<3>& uL, const Vars<3>& uR,
+                                  const double pL, const double pR,
+                                  const double eL, const double eR,
+                                  const double aL, const double aR,
+                                  const Vars<3>& normalVector,
+                                  Vars<5>& fluxL, Vars<5>& fluxR)
 {
     const double EL = eL + 0.5*norm2sqr(uL);
     const double ER = eR + 0.5*norm2sqr(uR);
 
-    const double HLeft  = eL + 0.5*norm2sqr(uL)  + pL/rhoL;
-    const double HRight = eR + 0.5*norm2sqr(uR) + pR/rhoR;
+    const double HL = EL + pL/rhoL;
+    const double HR = ER + pR/rhoR;
 
     const double qLeft  = dot(uL, normalVector);
     const double qRight = dot(uR, normalVector);
@@ -24,7 +24,8 @@ void TwoFluidSlau2::calculateFlux(const double alphaL, const double alphaR,
     const double aTilde   = 0.5*(aL   + aR);
     const double rhoTilde = 0.5*(rhoL + rhoR);
 
-    const double sqrtUDash = std::sqrt(0.5*(qLeft*qLeft + qRight*qRight));
+    //const double sqrtUDash = std::sqrt(0.5*(qLeft*qLeft + qRight*qRight));
+    const double sqrtUDash = std::sqrt(0.5*(norm2sqr(uL) + norm2sqr(uR)));
 
     const double MaRelLeft  = qLeft /aTilde;
     const double MaRelRight = qRight/aTilde;
@@ -33,8 +34,7 @@ void TwoFluidSlau2::calculateFlux(const double alphaL, const double alphaR,
 
     const double g = -std::max(std::min(MaRelLeft, 0.0), -1.0)*std::min(std::max(MaRelRight, 0.0), 1.0);
 
-    const double magVnBar = (rhoL*std::abs(qLeft) + rhoR*std::abs(qRight))
-        /(rhoL + rhoR);
+    const double magVnBar = (rhoL*std::abs(qLeft) + rhoR*std::abs(qRight))/(rhoL + rhoR);
         
     const double magVnBarPlus  = (1.0 - g)*magVnBar + g*std::abs(qLeft);
     const double magVnBarMinus = (1.0 - g)*magVnBar + g*std::abs(qRight);
@@ -51,9 +51,9 @@ void TwoFluidSlau2::calculateFlux(const double alphaL, const double alphaR,
         + sqrtUDash*(PPlusLeft + PMinusRight - 1.0)*rhoTilde*aTilde;
 
 
-    const double mTilde = 0.5*(rhoL*(qLeft + magVnBarPlus)
-        + rhoR*(qRight - magVnBarMinus)
-        - (Chi/aTilde)*(pR - pL));
+    const double mTilde = 0.5*(rhoL*(qLeft  + magVnBarPlus)
+                             + rhoR*(qRight - magVnBarMinus)
+                             - (Chi/aTilde)*(pR - pL));
 
     const double magMTilde = std::abs(mTilde);
 
@@ -61,7 +61,7 @@ void TwoFluidSlau2::calculateFlux(const double alphaL, const double alphaR,
                      0.5*(mTilde + magMTilde)*alphaL*uL[0] + 0.5*(mTilde - magMTilde)*alphaR*uR[0],
                      0.5*(mTilde + magMTilde)*alphaL*uL[1] + 0.5*(mTilde - magMTilde)*alphaR*uR[1],
                      0.5*(mTilde + magMTilde)*alphaL*uL[2] + 0.5*(mTilde - magMTilde)*alphaR*uR[2],
-                     0.5*(mTilde + magMTilde)*alphaL*HLeft + 0.5*(mTilde - magMTilde)*alphaR*HRight});
+                     0.5*(mTilde + magMTilde)*alphaL*HL    + 0.5*(mTilde - magMTilde)*alphaR*HR});
 
     fluxR = fluxL;
 
@@ -90,27 +90,28 @@ void TwoFluidSlau2::calculateFluxes(const Field<TwoFluid>& ul, const Field<TwoFl
         Vars<5> fluxLL;
         Vars<5> fluxRL;
 
-        double al = uL.soundSpeedG() + uL.soundSpeedL();
-        double ar = uR.soundSpeedG() + uR.soundSpeedL();
+        double aL = 0.5*(uL.soundSpeedG() + uL.soundSpeedL());
+        double aR = 0.5*(uR.soundSpeedG() + uR.soundSpeedL());
 
-        calculateFlux(uL.alphaG(), uR.alphaG(),
-                      uL.densityG(), uR.densityG(),
-                      uL.velocityG(), uR.velocityG(),
-                      uL.pressure(), uR.pressure(),
+        calculateFlux(uL.alphaG(),          uR.alphaG(),
+                      uL.densityG(),        uR.densityG(),
+                      uL.velocityG(),       uR.velocityG(),
+                      uL.pressure(),        uR.pressure(),
                       uL.internalEnergyG(), uR.internalEnergyG(),
-                      al, ar,
+                      aL,                   aR,
                       normalVector,
                       fluxLG, fluxRG);
 
-        calculateFlux(uL.alphaL(), uR.alphaL(),
-                      uL.densityL(), uR.densityL(),
-                      uL.velocityL(), uR.velocityL(),
-                      uL.pressure(), uR.pressure(),
+        calculateFlux(uL.alphaL(),          uR.alphaL(),
+                      uL.densityL(),        uR.densityL(),
+                      uL.velocityL(),       uR.velocityL(),
+                      uL.pressure(),        uR.pressure(),
                       uL.internalEnergyL(), uR.internalEnergyL(),
-                      al, ar,
+                      aL,                   aR,
                       normalVector,
                       fluxLL, fluxRL);
 
-        fluxesl[i] = join(fluxLG, fluxLL);
+        fluxesl[i] = join(fluxLG, fluxLL)*faceList[i].area;
+        fluxesr[i] = join(fluxRG, fluxRL)*faceList[i].area;
     }
 }

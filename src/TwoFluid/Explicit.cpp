@@ -17,8 +17,6 @@ void Explicit::solve()
 
     Vars<10> resNorm;
 
-    //Field<double> pInt(u.size());
-
     auto startAll = std::chrono::high_resolution_clock::now();
 
     while (iter < maxIter && !exitLoop)
@@ -32,10 +30,9 @@ void Explicit::solve()
         applyBoundaryConditions();
 
         pInt = calculateInterfacialPressure();
-        updateInterfacialPressureInConservative();
+        updateConservative();
 
         interpolateToFaces();
-
         fluxSolver->calculateFluxes(ul, ur, mesh.getFaceList(), fluxesl, fluxesr);
 
         Field<Vars<10>> res = calculateResidual();
@@ -43,8 +40,9 @@ void Explicit::solve()
         w += res*timeSteps;
 
         thermo->updateFromConservative(u, w, pInt);
-        blend();
-        thermo->update(u);
+        blend();        
+        thermo->updateInternal(u);
+        //blend();
 
         if(iter % 100 == 0)
         {
@@ -52,13 +50,18 @@ void Explicit::solve()
 
             resNorm = res.norm();
             outputCFD::saveResidual(savePath + "/residuals.txt", resNorm[0]);
-            std::cout << "iter: " << iter << " density res: " << resNorm[0] << std::endl;
+            std::cout << "iter: " << iter << ", density res: " << resNorm[0] << ", time: " << time << std::endl;
             if(resNorm[0] < targetError) exitLoop = true;
         }
 
         if(iter % saveEveryIter == 0)
         {
             outputCFD::outputVTK(savePath + "/results/results." + std::to_string(iter) + ".vtk", mesh, u);
+        }
+
+        if(time > 0.002)
+        {
+            exitLoop = true;
         }
     }
 

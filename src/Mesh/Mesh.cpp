@@ -79,8 +79,6 @@ void Mesh::sortCells()
     { 
         return norm2(a.center - zeroAxisForCellSort) < norm2(b.center - zeroAxisForCellSort); 
     });
-
-    int a = 5;
 }
 
 void Mesh::createFaces()

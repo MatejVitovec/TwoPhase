@@ -4,17 +4,19 @@
 TwoFluidCompressible::TwoFluidCompressible(const TwoFluid& u) : Vars<10>()
 {
     const double pInt = u.interfacialPressure();
+    const double alphaRhoG = u.alphaG()*u.densityG();
+    const double alphaRhoL = u.alphaL()*u.densityL();
 
-    data[ALPHA_RHO_G]        = u.alphaG()*u.densityG();
-    data[ALPHA_RHO_U_G]      = u.alphaG()*u.densityG()*u.velocityUG();
-    data[ALPHA_RHO_V_G]      = u.alphaG()*u.densityG()*u.velocityVG();
-    data[ALPHA_RHO_W_G]      = u.alphaG()*u.densityG()*u.velocityWG();
+    data[ALPHA_RHO_G]        = alphaRhoG;
+    data[ALPHA_RHO_U_G]      = alphaRhoG*u.velocityUG();
+    data[ALPHA_RHO_V_G]      = alphaRhoG*u.velocityVG();
+    data[ALPHA_RHO_W_G]      = alphaRhoG*u.velocityWG();
     data[ALPHA_RHO_E_PINT_G] = u.alphaG()*(u.densityG()*u.totalEnergyG() + pInt);
 
-    data[ALPHA_RHO_L]        = u.alphaL()*u.densityL();
-    data[ALPHA_RHO_U_L]      = u.alphaL()*u.densityL()*u.velocityUL();
-    data[ALPHA_RHO_V_L]      = u.alphaL()*u.densityL()*u.velocityVL();
-    data[ALPHA_RHO_W_L]      = u.alphaL()*u.densityL()*u.velocityWL();
+    data[ALPHA_RHO_L]        = alphaRhoL;
+    data[ALPHA_RHO_U_L]      = alphaRhoL*u.velocityUL();
+    data[ALPHA_RHO_V_L]      = alphaRhoL*u.velocityVL();
+    data[ALPHA_RHO_W_L]      = alphaRhoL*u.velocityWL();
     data[ALPHA_RHO_E_PINT_L] = u.alphaL()*(u.densityL()*u.totalEnergyL() + pInt);
 }
 
@@ -115,16 +117,3 @@ double TwoFluidCompressible::velocityWL() const
 {
     return data[ALPHA_RHO_W_L] / data[ALPHA_RHO_L];
 }
-
-/*Vars<5> TwoFluidCompressible::flux(const Vars<3>& thermoData, const Vars<3>& normalVector) const
-{
-    Vars<3> velocity = this->velocity();
-
-    double normalVelocity = dot(velocity, normalVector);
-
-    return TwoFluidCompressible({data[RHO] * normalVelocity,
-                         data[RHO] * velocity[0] * normalVelocity + thermoData[1] * normalVector[0],
-                         data[RHO] * velocity[1] * normalVelocity + thermoData[1] * normalVector[1],
-                         data[RHO] * velocity[2] * normalVelocity + thermoData[1] * normalVector[2],
-                         (data[RHO_E] + thermoData[1]) * normalVelocity});
-}*/

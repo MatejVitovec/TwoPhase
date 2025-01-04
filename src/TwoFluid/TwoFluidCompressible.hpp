@@ -19,7 +19,6 @@ class TwoFluidCompressible : public Vars<10>
         TwoFluidCompressible(const Vars<10>& varsIn) : Vars<10>(varsIn) {}
         TwoFluidCompressible(const std::array<double, 10>& in) : Vars<10>(in) {}
         TwoFluidCompressible(const TwoFluid& u);
-        //TwoFluidCompressible(const std::array<double, 5>& inRef ) : 
 
         virtual ~TwoFluidCompressible() {}
 
@@ -44,8 +43,6 @@ class TwoFluidCompressible : public Vars<10>
         double velocityUL() const;
         double velocityVL() const;
         double velocityWL() const;
-
-        //Vars<10> flux(const Vars<3>& thermoData, const Vars<3>& normalVector) const;
 };
 
 #endif // TWOFLUIDCOMPRESSIBLE_HPP

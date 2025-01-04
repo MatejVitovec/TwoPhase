@@ -13,7 +13,7 @@ double TwoFluid::densityL() const
 
 double TwoFluid::internalEnergyG() const
 {
-    return thermoData[INT_E_L];
+    return thermoData[INT_E_G];
 }
 
 double TwoFluid::internalEnergyL() const
@@ -33,12 +33,12 @@ double TwoFluid::soundSpeedL() const
 
 double TwoFluid::totalEnergyG() const
 {
-    return thermoData[INT_E_G] + 0.5*norm2(this->velocityG());
+    return thermoData[INT_E_G] + 0.5*norm2sqr(this->velocityG());
 }
 
 double TwoFluid::totalEnergyL() const
 {
-    return thermoData[INT_E_L] + 0.5*norm2(this->velocityL());
+    return thermoData[INT_E_L] + 0.5*norm2sqr(this->velocityL());
 }
 
 double TwoFluid::interfacialPressure() const
@@ -46,10 +46,11 @@ double TwoFluid::interfacialPressure() const
     constexpr double sigma = 2.0;
     constexpr double epsilonP = 0.01;
 
-    double pInt = sigma*((data[ALPHA]*thermoData[RHO_G]*(1.0 - data[ALPHA])*thermoData[RHO_L])
-        /(data[ALPHA]*thermoData[RHO_L] + (1.0 - data[ALPHA])*thermoData[RHO_G]))*norm2(this->velocityG() - this->velocityL()); //NUTNO OVERTIT
+    const double delta_pInt = sigma*((data[ALPHA]*thermoData[RHO_G]*(1.0 - data[ALPHA])*thermoData[RHO_L])
+        /(data[ALPHA]*thermoData[RHO_L] + (1.0 - data[ALPHA])*thermoData[RHO_G]))
+        *norm2sqr(this->velocityL() - this->velocityG()); //NUTNO OVERTIT
 
-    return data[P] - std::min(pInt, epsilonP*data[P]); //pInt = p - deltaP* (ve clanku "stratified model" od Lia je to pInt = deltaP*)
+    return data[P] - std::min(delta_pInt, epsilonP*data[P]); //pInt = p - deltaP* (ve clanku "stratified model" od Lia je to pInt = deltaP*)
 }
 
 void TwoFluid::blend()
@@ -64,15 +65,16 @@ void TwoFluid::blend()
     }
     else if (alphaL() < epsilonMax)
     {
-        const double xi = (alphaG() - epsilonMin)/(epsilonMax - epsilonMin);
-        const double gFunc = -std::pow(xi, 2.0)*(2*xi - 3.0);
+        const double xi = (alphaL() - epsilonMin)/(epsilonMax - epsilonMin);
+        const double gFunc = -std::pow(xi, 2.0)*(2.0*xi - 3.0);
 
         data[U_L] = gFunc*data[U_L] + (1.0 - gFunc)*data[U_G];
         data[V_L] = gFunc*data[V_L] + (1.0 - gFunc)*data[V_G];
         data[W_L] = gFunc*data[W_L] + (1.0 - gFunc)*data[W_G];
         data[T_L] = gFunc*data[T_L] + (1.0 - gFunc)*data[T_G];
     }
-    else if (alphaG() <= epsilonMin)
+    
+    if (alphaG() <= epsilonMin)
     {
         data[ALPHA] = epsilonMin;
         data[U_G] = data[U_L];
@@ -82,8 +84,8 @@ void TwoFluid::blend()
     }
     else if (alphaG() < epsilonMax)
     {
-        const double xi = (alphaL() - epsilonMin)/(epsilonMax - epsilonMin);
-        const double gFunc = -std::pow(xi, 2.0)*(2*xi - 3.0);
+        const double xi = (alphaG() - epsilonMin)/(epsilonMax - epsilonMin);
+        const double gFunc = -std::pow(xi, 2.0)*(2.0*xi - 3.0);
 
         data[U_G] = gFunc*data[U_G] + (1.0 - gFunc)*data[U_L];
         data[V_G] = gFunc*data[V_G] + (1.0 - gFunc)*data[V_L];

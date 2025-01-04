@@ -34,7 +34,7 @@ class TwoFluidFVMScheme
             ul(Field<TwoFluid>()),
             ur(Field<TwoFluid>()),
             cfl(0.8), maxIter(10000000),
-            targetError(0000005),
+            targetError(0.000005),
             localTimeStep(false),
             reconstruction(false),
             time(0.0),
@@ -124,6 +124,7 @@ class TwoFluidFVMScheme
         Field<Vars<10>> calculateResidual();
         Field<double> calculateInterfacialPressure();
         void updateInterfacialPressureInConservative();
+        void updateConservative();
         void boundField();
         void blend();
 

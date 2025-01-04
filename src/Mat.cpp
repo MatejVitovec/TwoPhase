@@ -35,6 +35,13 @@ Mat<3, 3> invSingularCheck(const Mat<3, 3>& u)
     {
         Mat<3,3> out = Mat<3,3>();
 
+        if (u[0][1] == 0.0 && u[1][0] == 0.0 && u[1][1] == 0.0)
+        {
+            out[0][0] = 1.0/u[0][0];
+
+            return out;
+        }
+
         out[0][0] = u[1][1];
         out[0][1] = -u[0][1];
         out[1][0] = -u[1][0];

@@ -221,10 +221,10 @@ void TwoFluidFVMScheme::interpolateToFaces()
     else
     {
         for (int i = 0; i < mesh.getFacesSize(); i++)
-        {        
-            ul[i] = u[ownerIndexList[i]];
+        {
+            const int neighbour = neighborIndexList[i];
 
-            int neighbour = neighborIndexList[i];
+            ul[i] = u[ownerIndexList[i]];
             if(neighbour >= 0)
             {
                 ur[i] = u[neighbour];
@@ -265,11 +265,20 @@ Field<double> TwoFluidFVMScheme::calculateInterfacialPressure()
     return out;
 }
 
+//Nejspise nepouziju
 void TwoFluidFVMScheme::updateInterfacialPressureInConservative()
 {
     for (int i = 0; i < w.size(); i++)
     {
         w[i].updateInterfacialPressure(pInt[i], u[i]);
+    }
+}
+
+void TwoFluidFVMScheme::updateConservative()
+{
+    for (int i = 0; i < u.size(); i++)
+    {
+        w[i] = u[i];
     }
 }
 
@@ -320,7 +329,7 @@ void TwoFluidFVMScheme::boundField()
 void TwoFluidFVMScheme::blend()
 {
     for (int i = 0; i < u.size(); i++)
-    {
+    {        
         u[i].blend();
     }
 }
@@ -360,12 +369,12 @@ Field<Vars<10>> TwoFluidFVMScheme::calculateResidual()
     for (int i = 0; i < faces.size(); i++)
     {
         const int owner = owners[i];
-        const int neighbor = neighbors[i];
+        const int neighbor = neighbors[i];        
         
         res[owner] -= fluxesl[i];
         if (neighbor >= 0)
         {
-            res[neighbor] += fluxesr[i]; //TODO overit jestli jsou pouzite spravne toky
+            res[neighbor] += fluxesr[i];
         }
     }
 
@@ -376,23 +385,23 @@ Field<Vars<10>> TwoFluidFVMScheme::calculateResidual()
 
         const Vars<3> normal = faces[i].area*faces[i].normalVector;
         
-        res[owner][TwoFluid::U_G] += pInt[owner]*ul[i].alphaG()*normal[0];
-        res[owner][TwoFluid::V_G] += pInt[owner]*ul[i].alphaG()*normal[1];
-        res[owner][TwoFluid::W_G] += pInt[owner]*ul[i].alphaG()*normal[2];
+        res[owner][TwoFluidCompressible::ALPHA_RHO_U_G] += pInt[owner]*ul[i].alphaG()*normal[0];
+        res[owner][TwoFluidCompressible::ALPHA_RHO_V_G] += pInt[owner]*ul[i].alphaG()*normal[1];
+        res[owner][TwoFluidCompressible::ALPHA_RHO_W_G] += pInt[owner]*ul[i].alphaG()*normal[2];
 
-        res[owner][TwoFluid::U_L] += pInt[owner]*ul[i].alphaL()*normal[0];
-        res[owner][TwoFluid::V_L] += pInt[owner]*ul[i].alphaL()*normal[1];
-        res[owner][TwoFluid::W_L] += pInt[owner]*ul[i].alphaL()*normal[2];
+        res[owner][TwoFluidCompressible::ALPHA_RHO_U_L] += pInt[owner]*ul[i].alphaL()*normal[0];
+        res[owner][TwoFluidCompressible::ALPHA_RHO_V_L] += pInt[owner]*ul[i].alphaL()*normal[1];
+        res[owner][TwoFluidCompressible::ALPHA_RHO_W_L] += pInt[owner]*ul[i].alphaL()*normal[2];
 
         if (neighbor >= 0)
         {
-            res[neighbor][TwoFluid::U_G] -= pInt[neighbor]*ur[i].alphaG()*normal[0];
-            res[neighbor][TwoFluid::V_G] -= pInt[neighbor]*ur[i].alphaG()*normal[1];
-            res[neighbor][TwoFluid::W_G] -= pInt[neighbor]*ur[i].alphaG()*normal[2];
+            res[neighbor][TwoFluidCompressible::ALPHA_RHO_U_G] -= pInt[neighbor]*ur[i].alphaG()*normal[0];
+            res[neighbor][TwoFluidCompressible::ALPHA_RHO_V_G] -= pInt[neighbor]*ur[i].alphaG()*normal[1];
+            res[neighbor][TwoFluidCompressible::ALPHA_RHO_W_G] -= pInt[neighbor]*ur[i].alphaG()*normal[2];
 
-            res[neighbor][TwoFluid::U_L] -= pInt[neighbor]*ur[i].alphaL()*normal[0];
-            res[neighbor][TwoFluid::V_L] -= pInt[neighbor]*ur[i].alphaL()*normal[1];
-            res[neighbor][TwoFluid::W_L] -= pInt[neighbor]*ur[i].alphaL()*normal[2];
+            res[neighbor][TwoFluidCompressible::ALPHA_RHO_U_L] -= pInt[neighbor]*ur[i].alphaL()*normal[0];
+            res[neighbor][TwoFluidCompressible::ALPHA_RHO_V_L] -= pInt[neighbor]*ur[i].alphaL()*normal[1];
+            res[neighbor][TwoFluidCompressible::ALPHA_RHO_W_L] -= pInt[neighbor]*ur[i].alphaL()*normal[2];
         }
     }
 

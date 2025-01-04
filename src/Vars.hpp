@@ -192,12 +192,7 @@ inline double norm2sqr(const Vars<N>& u)
 template <int N>
 inline double norm2(const Vars<N>& u)
 {
-    double out = 0.0;
-    for (int i = 0; i < N; i++)
-    {
-        out += u[i]*u[i];
-    }
-    return std::sqrt(out);
+    return std::sqrt(norm2sqr(u));
 }
 
 template <int N>

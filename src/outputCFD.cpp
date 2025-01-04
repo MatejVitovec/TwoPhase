@@ -162,7 +162,6 @@ void outputCFD::outputVTK(std::string fileName, const Mesh& mesh, const Field<Tw
 		f << roundToZero(u[i].densityG()) << "\n";
 	}
 
-	//f << "VECTORS u float\n"; 
  	f << "SCALARS UG float 3\n"; 
 	f << "LOOKUP_TABLE default\n";
 
@@ -204,15 +203,20 @@ void outputCFD::outputVTK(std::string fileName, const Mesh& mesh, const Field<Tw
 
 	f << "SCALARS TG float\n"; 
 	f << "LOOKUP_TABLE default\n";
-
     for (int i = 0; i < cellSize; i++)
     {
 		f << roundToZero(u[i].temperatureG()) << "\n";
 	}
 
+	f << "SCALARS TL float\n"; 
+	f << "LOOKUP_TABLE default\n";
+    for (int i = 0; i < cellSize; i++)
+    {
+		f << roundToZero(u[i].temperatureL()) << "\n";
+	}
+
 	f << "SCALARS alpha float\n"; 
 	f << "LOOKUP_TABLE default\n";
-
     for (int i = 0; i < cellSize; i++)
     {
 		f << roundToZero(u[i].alpha()) << "\n";
