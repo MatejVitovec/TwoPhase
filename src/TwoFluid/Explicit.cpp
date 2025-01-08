@@ -29,7 +29,7 @@ void Explicit::solve()
 
         applyBoundaryConditions();
 
-        pInt = calculateInterfacialPressure();
+        calculateInterfacialPressure();
         updateConservative();
 
         interpolateToFaces();
@@ -42,7 +42,6 @@ void Explicit::solve()
         thermo->updateFromConservative(u, w, pInt);
         blend();        
         thermo->updateInternal(u);
-        //blend();
 
         if(iter % 100 == 0)
         {
@@ -57,11 +56,6 @@ void Explicit::solve()
         if(iter % saveEveryIter == 0)
         {
             outputCFD::outputVTK(savePath + "/results/results." + std::to_string(iter) + ".vtk", mesh, u);
-        }
-
-        if(time > 0.002)
-        {
-            exitLoop = true;
         }
     }
 

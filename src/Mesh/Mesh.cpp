@@ -94,6 +94,13 @@ void Mesh::createFaces()
         cellList[j].ownFaceIndex.clear();
         std::vector<Face> ownFaces = cellList[j].createFaces();
 
+        for (auto& face : ownFaces)
+        {
+            face.update(nodeList);
+        }        
+
+        ownFaces.erase(std::remove_if(ownFaces.begin(), ownFaces.end(), [](const Face& face) { return (face.midpoint[2] < 0.00001 || face.midpoint[2] > 0.00009); }), ownFaces.end());
+
         for (auto & ownFace : ownFaces)
         {
             bool existInList = false;
@@ -446,7 +453,7 @@ void Mesh::createBoundariesGmsh(const std::vector<std::vector<std::string>>& phy
         }
         else
         {
-            std::cout << "Chybejici Cell, index:" << i << std::endl;
+            std::cout << "Chybejici face, index:" << i << std::endl;
             cellList.push_back(Cell());
         }
     }
@@ -463,6 +470,11 @@ void Mesh::createBoundariesGmsh(const std::vector<std::vector<std::string>>& phy
         physicalName.erase(0,1);
         physicalName.pop_back();
 
+        if (physicalName == "free1" || physicalName == "free2")
+        {
+            continue;
+        }
+
         Boundary auxBoundary = Boundary(physicalName);
 
         for (int j = 0; j < auxFacePhysicalGroupList.size(); j++)
@@ -478,7 +490,7 @@ void Mesh::createBoundariesGmsh(const std::vector<std::vector<std::string>>& phy
                 }                
             }
         }
-        
+
         boundaryList.push_back(auxBoundary);
     }
 

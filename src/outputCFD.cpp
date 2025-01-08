@@ -154,6 +154,7 @@ void outputCFD::outputVTK(std::string fileName, const Mesh& mesh, const Field<Tw
 	}
 	
 	f << "CELL_DATA " << cellSize << "\n";
+	
  	f << "SCALARS rhoG float\n"; 
 	f << "LOOKUP_TABLE default\n";
 
@@ -162,12 +163,28 @@ void outputCFD::outputVTK(std::string fileName, const Mesh& mesh, const Field<Tw
 		f << roundToZero(u[i].densityG()) << "\n";
 	}
 
+ 	f << "SCALARS rhoL float\n"; 
+	f << "LOOKUP_TABLE default\n";
+
+    for (int i = 0; i < cellSize; i++)
+    {
+		f << roundToZero(u[i].densityL()) << "\n";
+	}
+
  	f << "SCALARS UG float 3\n"; 
 	f << "LOOKUP_TABLE default\n";
 
     for (int i = 0; i < cellSize; i++)
     {
 		f << roundToZero(u[i].velocityUG()) << " " << roundToZero(u[i].velocityVG()) << " " << roundToZero(u[i].velocityWG()) << "\n";
+	}
+
+	f << "SCALARS UL float 3\n"; 
+	f << "LOOKUP_TABLE default\n";
+
+    for (int i = 0; i < cellSize; i++)
+    {
+		f << roundToZero(u[i].velocityUL()) << " " << roundToZero(u[i].velocityVL()) << " " << roundToZero(u[i].velocityWL()) << "\n";
 	}	
 
  	f << "SCALARS eG float\n"; 
@@ -176,6 +193,14 @@ void outputCFD::outputVTK(std::string fileName, const Mesh& mesh, const Field<Tw
     for (int i = 0; i < cellSize; i++)
     {
 		f << roundToZero(u[i].internalEnergyG()) << "\n";
+	}
+
+	f << "SCALARS eL float\n"; 
+	f << "LOOKUP_TABLE default\n";
+
+    for (int i = 0; i < cellSize; i++)
+    {
+		f << roundToZero(u[i].internalEnergyL()) << "\n";
 	}
 	
 	f << "SCALARS p float\n"; 
@@ -198,6 +223,21 @@ void outputCFD::outputVTK(std::string fileName, const Mesh& mesh, const Field<Tw
 		else
 		{		
 			f << roundToZero(u[i].absVelocityG()/u[i].soundSpeedG()) << "\n";
+		}
+	}
+
+	f << "SCALARS ML float\n"; 
+	f << "LOOKUP_TABLE default\n";
+
+    for (int i = 0; i < cellSize; i++)
+    {
+		if (u[i].absVelocityL() == 0.0)
+		{
+			f << 0.0 << "\n";
+		}
+		else
+		{		
+			f << roundToZero(u[i].absVelocityL()/u[i].soundSpeedL()) << "\n";
 		}
 	}
 

@@ -161,3 +161,31 @@ std::vector<CompressibleMixture> Periodicity::calc(const VolField<CompressibleMi
 
     return out;   
 }
+
+
+
+
+
+/////////////
+
+
+void Periodicity::apply(VolField<Fluid>& u, const Mesh& mesh, const Thermo * const thermoModel) const
+{
+    //TODO
+}
+
+void Periodicity::correct(const VolField<Fluid>& u, const Field<Fluid>& ul, const Field<Fluid>& ur, const Field<Mat<5,3>>& grad, const Field<Vars<5>>& phi, const Mesh& mesh, const Thermo * const thermoModel) const
+{
+    //TODO
+}
+
+
+void Periodicity::apply(VolField<TwoFluid>& u, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const
+{
+    //TODO
+}
+
+void Periodicity::correct(const VolField<TwoFluid>& u, const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const
+{
+    //TODO
+}

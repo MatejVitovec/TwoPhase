@@ -113,3 +113,10 @@ void TwoFluidThermo::updateBoundary(VolField<TwoFluid>& u) const
 }
 
 
+TwoFluid TwoFluidThermo::isentropicInlet(double pTot, double TTot, double rhoTot, double sTot, double hTot, const Vars<3>& velocityDirection, const TwoFluid& stateIn) const
+{
+    //TODO
+    TwoFluid out = TwoFluid();
+
+    return out;
+}

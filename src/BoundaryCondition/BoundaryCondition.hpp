@@ -6,7 +6,7 @@
 #include "../Mesh/Boundary.hpp"
 #include "../Mesh/Face.hpp"
 #include "../Compressible.hpp"
-#include "../Primitive.hpp"
+#include "../Fluid.hpp"
 #include "../ThermoVar.hpp"
 #include "../Field.hpp"
 #include "../VolField.hpp"
@@ -22,7 +22,7 @@
 class BoundaryCondition
 {
     public:
-        enum BoundaryConditionType{ISENTROPICINLET, PRESSUREOUTLET, FREEBOUNDARY, WALL, PERIODICITY, MEANPRESSUREOUTLET};
+        enum BoundaryConditionType{ISENTROPICINLET, PRESSUREOUTLET, FREEBOUNDARY, WALL, PERIODICITY, MEANPRESSUREOUTLET, INLET};
 
         BoundaryCondition(BoundaryConditionType type_) : type(type_) , id(0) {}
         BoundaryCondition(Boundary meshBoundary, BoundaryConditionType type_, int id_) : boundary(meshBoundary), type(type_), id(id_) {}
@@ -54,6 +54,10 @@ class BoundaryCondition
                              const Mesh& mesh, const Thermo * const thermoModel) const;
         
         //Jina implementace pro TWOFLUID kdyz se osvetsi predelat i pro zbytek
+        virtual void apply(VolField<Fluid>& u, const Mesh& mesh, const Fluid * const thermoModel) const;
+        virtual void correct(const VolField<Fluid>& u, const Field<Fluid>& ul, const Field<Fluid>& ur, const Field<Mat<5,3>>& grad, const Field<Vars<5>>& phi, const Mesh& mesh, const Thermo * const thermoModel) const; 
+
+
         virtual void apply(VolField<TwoFluid>& u, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const;
         virtual void correct(const VolField<TwoFluid>& u, const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const; 
 

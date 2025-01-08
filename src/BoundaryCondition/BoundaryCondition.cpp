@@ -77,6 +77,17 @@ void BoundaryCondition::correct(const Field<Primitive>& u, Field<Primitive>& ul,
 
 }
 
+void BoundaryCondition::apply(VolField<Fluid>& u, const Mesh& mesh, const Fluid * const thermoModel) const
+{
+
+}
+
+void BoundaryCondition::correct(const VolField<Fluid>& u, const Field<Fluid>& ul, const Field<Fluid>& ur, const Field<Mat<5,3>>& grad, const Field<Vars<5>>& phi, const Mesh& mesh, const Thermo * const thermoModel) const
+{
+
+}
+
+
 
 void BoundaryCondition::apply(VolField<TwoFluid>& u, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const
 {

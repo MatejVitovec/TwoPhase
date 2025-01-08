@@ -89,7 +89,38 @@ void Wall::correct(const Field<CompressibleMixture>& w, Field<CompressibleMixtur
     }
 }
 
+//NOVY PRISTUP
 
+void Wall::apply(VolField<Fluid>& u, const Mesh& mesh, const Thermo * const thermoModel) const
+{
+    const std::vector<Face>& faceList = mesh.getFaceList();
+    const std::vector<int>& ownerIndexList = mesh.getOwnerIndexList();
+
+    std::vector<Fluid>& boundaryData = u.boundary(id);
+
+    for (int i = 0; i < boundary.facesIndex.size(); i++) //Predelat - zbavid se boundary.facesIndex a nahradit indexem boundaryId a boundaryFaceList nahrat z meshe
+    {
+        updateState(u[ownerIndexList[boundary.facesIndex[i]]], faceList[boundary.facesIndex[i]], boundaryData[i]);    
+    }    
+}
+
+void Wall::updateState(const Fluid& stateIn, const Face& f, Fluid& u) const
+{
+    const Vars<3>& normalVector = f.normalVector;
+
+    u = stateIn;
+
+    Vars<3> ghostVelocity = stateIn.velocity() - 2*stateIn.normalVelocity(normalVector)*normalVector;
+
+    u[Fluid::U] = ghostVelocity[0];
+    u[Fluid::V] = ghostVelocity[1];
+    u[Fluid::W] = ghostVelocity[2];
+}
+
+void Wall::correct(const VolField<Fluid>& u, const Field<Fluid>& ul, const Field<Fluid>& ur, const Field<Mat<5,3>>& grad, const Field<Vars<5>>& phi, const Mesh& mesh, const Thermo * const thermoModel) const
+{
+    //TODO
+}
 
 
 //TWOFLUID
@@ -106,14 +137,14 @@ void Wall::apply(VolField<TwoFluid>& u, const Mesh& mesh, const TwoFluidThermo *
     }    
 }
 
-void Wall::updateState(const TwoFluid& steteIn, const Face& f, TwoFluid& u) const
+void Wall::updateState(const TwoFluid& stateIn, const Face& f, TwoFluid& u) const
 {
     const Vars<3>& normalVector = f.normalVector;
 
-    u = steteIn;
+    u = stateIn;
 
-    Vars<3> ghostVelocityG = steteIn.velocityG() - 2*steteIn.normalVelocityG(normalVector)*normalVector;
-    Vars<3> ghostVelocityL = steteIn.velocityL() - 2*steteIn.normalVelocityL(normalVector)*normalVector;
+    Vars<3> ghostVelocityG = stateIn.velocityG() - 2*stateIn.normalVelocityG(normalVector)*normalVector;
+    Vars<3> ghostVelocityL = stateIn.velocityL() - 2*stateIn.normalVelocityL(normalVector)*normalVector;
 
     /*u[TwoFluid::U_G] = ghostVelocityG[0];
     u[TwoFluid::V_G] = ghostVelocityG[1];
@@ -127,6 +158,6 @@ void Wall::updateState(const TwoFluid& steteIn, const Face& f, TwoFluid& u) cons
 
 void Wall::correct(const VolField<TwoFluid>& u, const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const
 {
-
+    //TODO
 }
 

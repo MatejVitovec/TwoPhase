@@ -94,6 +94,7 @@ void TwoFluidFVMScheme::setInitialConditions(const Field<TwoFluidPrimitive>& ini
     {
         u[i] = initialCondition[i];
     }
+    thermo->updateInternal(u);
 }
 
 void TwoFluidFVMScheme::init()
@@ -220,6 +221,8 @@ void TwoFluidFVMScheme::interpolateToFaces()
     }
     else
     {
+        thermo->updateBoundary(u);
+        
         for (int i = 0; i < mesh.getFacesSize(); i++)
         {
             const int neighbour = neighborIndexList[i];
@@ -250,19 +253,16 @@ void TwoFluidFVMScheme::applyBoundaryConditions()
     {
         boundaryCondition->apply(u, mesh, thermo.get());
     }
-    
-    thermo->updateBoundary(u);
+
+    //thermo->updateBoundary(u); //TODO - stare pokud vypocet funguje odstranit
 }
 
-Field<double> TwoFluidFVMScheme::calculateInterfacialPressure()
+void TwoFluidFVMScheme::calculateInterfacialPressure()
 {
-    Field<double> out(u.size());
     for (int i = 0; i < u.size(); i++)
     {
-        out[i] = u[i].interfacialPressure();
+        pInt[i] = u[i].interfacialPressure();
     }
-    
-    return out;
 }
 
 //Nejspise nepouziju

@@ -22,12 +22,14 @@ class TwoFluidThermo
 
         virtual ~TwoFluidThermo() {}
 
-        virtual void updateFromConservative(VolField<TwoFluid>& u, const Field<TwoFluidCompressible>& w, const Field<double>& pInt) const;
+        void updateFromConservative(VolField<TwoFluid>& u, const Field<TwoFluidCompressible>& w, const Field<double>& pInt) const;
         
-        virtual void update(VolField<TwoFluid>& u) const;
-        virtual void update(Field<TwoFluid>& u) const;
-        virtual void updateInternal(Field<TwoFluid>& u) const;
-        virtual void updateBoundary(VolField<TwoFluid>& u) const;
+        void update(VolField<TwoFluid>& u) const;
+        void update(Field<TwoFluid>& u) const;
+        void updateInternal(Field<TwoFluid>& u) const;
+        void updateBoundary(VolField<TwoFluid>& u) const;
+
+        TwoFluid isentropicInlet(double pTot, double TTot, double rhoTot, double sTot, double hTot, const Vars<3>& velocityDirection, const TwoFluid& stateIn) const;
 
     private:
         //StiffenedGasThermo gasThermo;

@@ -13,6 +13,17 @@ CompressibleMixture IsentropicInlet::calculateState(const CompressibleMixture& w
 
 //TWOFLUID
 
+void IsentropicInlet::apply(VolField<Fluid>& u, const Mesh& mesh, const Thermo * const thermoModel) const
+{
+
+}
+
+void IsentropicInlet::correct(const VolField<Fluid>& u, const Field<Fluid>& ul, const Field<Fluid>& ur, const Field<Mat<5,3>>& grad, const Field<Vars<5>>& phi, const Mesh& mesh, const Thermo * const thermoModel) const
+{
+
+}
+
+
 void IsentropicInlet::apply(VolField<TwoFluid>& u, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const
 {
 

@@ -122,7 +122,7 @@ class TwoFluidFVMScheme
         void interpolateToFaces();
         void applyBoundaryConditions(); //drive se jmenovalo calcBoundaryConditionFields()
         Field<Vars<10>> calculateResidual();
-        Field<double> calculateInterfacialPressure();
+        void calculateInterfacialPressure();
         void updateInterfacialPressureInConservative();
         void updateConservative();
         void boundField();
