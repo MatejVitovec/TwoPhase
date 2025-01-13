@@ -5,6 +5,7 @@
 
 void TwoFluidThermo::updateFromConservative(VolField<TwoFluid>& u, const Field<TwoFluidCompressible>& w, const Field<double>& pInt) const
 {
+    #pragma omp parallel for
     for (int i = 0; i < w.size(); i++)
     {       
         const double guessAlpha = u[i].alpha();
@@ -72,6 +73,7 @@ void TwoFluidThermo::update(Field<TwoFluid>& u) const
 
 void TwoFluidThermo::updateInternal(Field<TwoFluid>& u) const
 {
+    #pragma omp parallel for
     for (int i = 0; i < u.size(); i++)
     {
         const double pressure = u[i][TwoFluid::P];

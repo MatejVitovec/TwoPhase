@@ -27,7 +27,7 @@ void Explicit::solve()
 
         updateTimeStep();
 
-        applyBoundaryConditions();
+        /*applyBoundaryConditions();
 
         calculateInterfacialPressure();
         updateConservative();
@@ -39,6 +39,43 @@ void Explicit::solve()
 
         w += res*timeSteps;
 
+        thermo->updateFromConservative(u, w, pInt);
+        blend();        
+        thermo->updateInternal(u);*/
+
+        Field<TwoFluidCompressible> wOld;
+
+
+        applyBoundaryConditions();
+        calculateInterfacialPressure();
+        updateConservative();
+        wOld = w;
+        interpolateToFaces();
+        fluxSolver->calculateFluxes(ul, ur, mesh.getFaceList(), fluxesl, fluxesr);
+        Field<Vars<10>> res = calculateResidual();
+        w += res*timeSteps;
+        thermo->updateFromConservative(u, w, pInt);
+        blend();        
+        thermo->updateInternal(u);
+
+        applyBoundaryConditions();
+        calculateInterfacialPressure();
+        updateConservative();
+        interpolateToFaces();
+        fluxSolver->calculateFluxes(ul, ur, mesh.getFaceList(), fluxesl, fluxesr);
+        res = calculateResidual();
+        w = wOld*(3.0/4.0) + w*(1.0/4.0) + res*(timeSteps*(1.0/4.0));
+        thermo->updateFromConservative(u, w, pInt);
+        blend();        
+        thermo->updateInternal(u);
+
+        applyBoundaryConditions();
+        calculateInterfacialPressure();
+        updateConservative();
+        interpolateToFaces();
+        fluxSolver->calculateFluxes(ul, ur, mesh.getFaceList(), fluxesl, fluxesr);
+        res = calculateResidual();
+        w = wOld*(1.0/3.0) + w*(2.0/3.0) + res*(timeSteps*(2.0/3.0));
         thermo->updateFromConservative(u, w, pInt);
         blend();        
         thermo->updateInternal(u);

@@ -79,6 +79,7 @@ void TwoFluidSlau2::calculateFlux(const double alphaL, const double alphaR,
 
 void TwoFluidSlau2::calculateFluxes(const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const std::vector<Face>& faceList, Field<Vars<10>>& fluxesl, Field<Vars<10>>& fluxesr)
 {
+    #pragma omp parallel for
     for (int i = 0; i < ul.size(); i++)
     {
         const Vars<3>& normalVector = faceList[i].normalVector;

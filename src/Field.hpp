@@ -65,6 +65,7 @@ template<typename T>
 template<typename U>
 void Field<T>::operator+=(const Field<U>& v)
 {
+    #pragma omp parallel for
     for (int i = 0; i < data.size(); i++)
     {
         data[i] += v[i];
@@ -75,6 +76,7 @@ template<typename T>
 template<typename U>
 void Field<T>::operator-=(const Field<U>& v)
 {
+    #pragma omp parallel for
     for (int i = 0; i < data.size(); i++)
     {
         data[i] += v[i];
@@ -87,6 +89,7 @@ Field<T> operator+ (const Field<T>& u, const Field<U>& v)
 {
     Field<T> out(u.size());
 
+    #pragma omp parallel for
     for (int i = 0; i < u.size(); i++)
     {
         out[i] = u[i] + v[i];
@@ -100,6 +103,7 @@ Field<T> operator- (const Field<T>& u, const Field<U>& v)
 {
     Field<T> out(u.size());
 
+    #pragma omp parallel for
     for (int i = 0; i < u.size(); i++)
     {
         out[i] = u[i] - v[i];
@@ -113,6 +117,7 @@ Field<T> operator+ (const Field<T>& u, const T& a)
 {
     Field<T> out(u.size());
 
+    #pragma omp parallel for
     for (int i = 0; i < u.size(); i++)
     {
         out[i] = u[i] - a;
@@ -126,6 +131,7 @@ Field<T> operator- (const Field<T>& u, const T& a)
 {
     Field<T> out(u.size());
 
+    #pragma omp parallel for
     for (int i = 0; i < u.size(); i++)
     {
         out[i] = u[i] - a;
@@ -139,6 +145,7 @@ Field<T> operator* (const Field<T>& u, const Field<D>& v)
 {
     Field<T> out(u.size());
 
+    #pragma omp parallel for
     for (int i = 0; i < u.size(); i++)
     {
         out[i] = u[i]*v[i];
@@ -152,6 +159,7 @@ Field<T> operator/ (const Field<T>& u, const Field<D>& v)
 {
     Field<T> out(u.size());
 
+    #pragma omp parallel for
     for (int i = 0; i < u.size(); i++)
     {
         out[i] = u[i]/v[i];
@@ -165,6 +173,7 @@ Field<T> operator* (const Field<T>& u, const D& a)
 {
     Field<T> out(u.size());
 
+    #pragma omp parallel for
     for (int i = 0; i < u.size(); i++)
     {
         out[i] = u[i]*a;
@@ -178,6 +187,7 @@ Field<T> operator/ (const Field<T>& u, const D& a)
 {
     Field<T> out(u.size());
 
+    #pragma omp parallel for
     for (int i = 0; i < u.size(); i++)
     {
         out[i] = u[i]/a;
