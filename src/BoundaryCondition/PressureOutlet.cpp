@@ -108,7 +108,7 @@ void PressureOutlet::updateState(const TwoFluid& stateIn, const Face& f, TwoFlui
 
 
 
-void PressureOutlet::correct(const VolField<TwoFluid>& u, const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const
+void PressureOutlet::correct(const VolField<TwoFluid>& u, Field<TwoFluid>& ul, Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const
 {
     //DO NOTHING
     return;

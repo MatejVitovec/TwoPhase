@@ -52,11 +52,11 @@ void dropletAlphaInitialCond(double epsilon, double radius, const double delta, 
         {
             double xi = (cellRadius - (radius - 2.0*delta))/(4.0*delta);
             double G = -std::pow(xi, 2.0)*(2.0*xi - 3.0);
-            u[i][TwoFluid::ALPHA] = G*epsilon + (1.0 - G)*(1.0 - epsilon);
+            u[i][TwoFluid::ALPHA] = G*(1.0 - epsilon) + (1.0 - G)*epsilon;
         }
         else if(cellRadius < radius)
         {
-            u[i][TwoFluid::ALPHA] = 1.0 - epsilon;
+            u[i][TwoFluid::ALPHA] = epsilon;
         }
     }
 }
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
 
     solver->setCfl(0.1);
     solver->setMaxIter(24000);
-    solver->setSaveEveryIter(100);
+    solver->setSaveEveryIter(50);
 
     std::vector<std::shared_ptr<BoundaryCondition>> bcList(solver->getMesh().getBoundarySize());
     bcList[0] = std::make_shared<Inlet>(solver->getMesh().getBoundaryList()[0], 381.85, Vars<3>({225.86, 0.0, 0.0}), 0);
@@ -93,11 +93,11 @@ int main(int argc, char** argv)
     
     solver->setBoundaryConditions(bcList);
 
-    const double epsilon = 1.0e-7;
+    const double epsilon = 1.0e-5;
 
                                                                                    //alpha,       p,     tg,     tl,     ug,  vg,  wg,     ul,  vl,  wl
-    Field<TwoFluidPrimitive> initialCond = riemannInitialCond(TwoFluidPrimitive({epsilon, 2.35438e5, 381.85, 381.85, 225.86, 0.0, 0.0, 225.86, 0.0, 0.0}),
-                                                              TwoFluidPrimitive({epsilon,     1.0e5, 293.15, 293.15,    0.0, 0.0, 0.0,    0.0, 0.0, 0.0}),
+    Field<TwoFluidPrimitive> initialCond = riemannInitialCond(TwoFluidPrimitive({1.0 - epsilon, 2.35438e5, 381.85, 381.85, 225.86, 0.0, 0.0, 225.86, 0.0, 0.0}),
+                                                              TwoFluidPrimitive({1.0 - epsilon,     1.0e5, 293.15, 293.15,    0.0, 0.0, 0.0,    0.0, 0.0, 0.0}),
                                                               -0.004, solver->getMesh());
 
     dropletAlphaInitialCond(epsilon, 0.0032, 0.000025, solver->getMesh(), initialCond);
@@ -114,7 +114,7 @@ int main(int argc, char** argv)
 
     solver->solve();
 
-    outputCFD::outputVTK("../results/RiemannTest1/results/resultsFinal.vtk", solver->getMesh(), solver->getResults());
+    outputCFD::outputVTK("../results/Droplet/results/resultsFinal.vtk", solver->getMesh(), solver->getResults());
 
     return 0;
 }

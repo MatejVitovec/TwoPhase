@@ -35,6 +35,29 @@ void Cell::update(const std::vector<Face>& faceList)
     projectedArea = 0.5*projArea;
 }
 
+void Cell::update(const std::vector<Vars<3>>& nodeList)
+{
+    double vol = 0.0;
+    Vars<3> cen = Vars<3>({0.0, 0.0, 0.0});
+    Vars<3> projArea = Vars<3>({0.0, 0.0, 0.0});
+
+    std::vector<Face> ownFaceList = createFaces();
+
+    for (auto& face : ownFaceList)
+    {
+        face.update(nodeList);
+        Vars<3> midpoint = face.midpoint;
+        Vars<3> normal = face.area*face.normalVector;
+        vol += dot(midpoint, normal);
+        cen = cen + std::pow(norm2(midpoint), 2.0)*normal;
+        projArea = projArea + abs(normal);
+    }
+    
+    volume = vol/3.0;
+    center = (0.5/volume)*cen;
+    projectedArea = 0.5*projArea;
+}
+
 int Cell::getVtkType() const
 {
     if(type == TETRAHEDRON) return 10;

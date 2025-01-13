@@ -214,7 +214,8 @@ void Mesh::updateCells()
 {
     for(auto & cell : cellList)
     {
-        cell.update(faceList);
+        //cell.update(faceList);
+        cell.update(nodeList);
     }
 }
 

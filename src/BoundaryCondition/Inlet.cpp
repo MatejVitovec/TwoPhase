@@ -24,7 +24,7 @@ void Inlet::correct(const VolField<Fluid>& u, const Field<Fluid>& ul, const Fiel
 //TWOFLUID
 void Inlet::apply(VolField<TwoFluid>& u, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const
 {
-    constexpr double epsilon = 1.0e-7; //TODO - asi jako global
+    constexpr double epsilon = 1.0e-5; //TODO - asi jako global
 
     const std::vector<Face>& faceList = mesh.getFaceList();
     const std::vector<int>& ownerIndexList = mesh.getOwnerIndexList();
@@ -33,11 +33,11 @@ void Inlet::apply(VolField<TwoFluid>& u, const Mesh& mesh, const TwoFluidThermo 
 
     for (int i = 0; i < boundary.facesIndex.size(); i++) //Predelat - zbavid se boundary.facesIndex a nahradit indexem boundaryId a boundaryFaceList nahrat z meshe
     {
-        boundaryData[i] = TwoFluid({epsilon, u[ownerIndexList[boundary.facesIndex[i]]].pressure(), temperature, temperature, velocity[0], velocity[1], velocity[2], velocity[0], velocity[1], velocity[2]}); 
+        boundaryData[i] = TwoFluid({1.0 - epsilon, u[ownerIndexList[boundary.facesIndex[i]]].pressure(), temperature, temperature, velocity[0], velocity[1], velocity[2], velocity[0], velocity[1], velocity[2]}); 
     }    
 }
 
-void Inlet::correct(const VolField<TwoFluid>& u, const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const
+void Inlet::correct(const VolField<TwoFluid>& u, Field<TwoFluid>& ul, Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const
 {
     return; //DO NOTHING
 }

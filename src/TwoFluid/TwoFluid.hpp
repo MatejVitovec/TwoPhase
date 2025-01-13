@@ -40,7 +40,7 @@ class TwoFluid : public TwoFluidPrimitive
 
     private:
 
-        static constexpr double epsilonMin = 1.0e-8;
+        static constexpr double epsilonMin = 1.0e-5;
         static constexpr double epsilonMax = 1.0e-4;
 
         std::array<double, 6> thermoData;

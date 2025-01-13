@@ -433,7 +433,7 @@ Field<Vars<10>> Limiter::calculateLimiter(const VolField<TwoFluid>& w, Field<Mat
         Vars<10> denominatorOwner = dot(grad[owner], faces[i].midpoint - cells[owner].center);
         Vars<10> phiCnOwner;
 
-        for (int k = 0; k < 5; k++)
+        for (int k = 0; k < 10; k++) // TODO spatny design tohle by melo byt vramci operator overload nebo function
         {
             if (denominatorOwner[k] > 0.0)
             {
@@ -460,7 +460,7 @@ Field<Vars<10>> Limiter::calculateLimiter(const VolField<TwoFluid>& w, Field<Mat
         Vars<10> denominatorNeighbor = dot(grad[neighbor], faces[i].midpoint - cells[neighbor].center);
         Vars<10> phiCnNeighbor;
 
-        for (int k = 0; k < 5; k++)
+        for (int k = 0; k < 10; k++)
         {
             if (denominatorNeighbor[k] > 0.0)
             {

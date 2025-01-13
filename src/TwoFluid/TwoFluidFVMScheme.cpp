@@ -209,6 +209,14 @@ void TwoFluidFVMScheme::interpolateToFaces()
             {
                 ul[i] = u[ownerIndexList[i]];
             }
+
+            /*if (ownerIndexList[i] == 34625 || neighborIndexList[i] == 34625)
+            {
+                std::cout << ul[i].pressure() << std::endl;
+                std::cout << ur[i].pressure() << std::endl << std::endl;
+
+                std::cout << faces[i].midpoint[0] << " , id: " << i << std::endl << std::endl << std::endl;
+            }*/
         }
 
         for (auto & boundaryCondition : boundaryConditionList)

@@ -16,6 +16,7 @@ class Cell
         Cell(std::vector<int> nodesIdx, cellType cType) : nodesIndex(nodesIdx), type(cType) {};
 
         void update(const std::vector<Face>& faceList);
+        void update(const std::vector<Vars<3>>& nodeList);
 
         std::vector<Face> createFaces(); //for GMSH
 

@@ -133,7 +133,7 @@ void Wall::apply(VolField<TwoFluid>& u, const Mesh& mesh, const TwoFluidThermo *
 
     for (int i = 0; i < boundary.facesIndex.size(); i++) //Predelat - zbavid se boundary.facesIndex a nahradit indexem boundaryId a boundaryFaceList nahrat z meshe
     {
-        updateState(u[ownerIndexList[boundary.facesIndex[i]]], faceList[boundary.facesIndex[i]], boundaryData[i]);    
+        updateState(u[ownerIndexList[boundary.facesIndex[i]]], faceList[boundary.facesIndex[i]], boundaryData[i]);
     }    
 }
 
@@ -146,18 +146,32 @@ void Wall::updateState(const TwoFluid& stateIn, const Face& f, TwoFluid& u) cons
     Vars<3> ghostVelocityG = stateIn.velocityG() - 2*stateIn.normalVelocityG(normalVector)*normalVector;
     Vars<3> ghostVelocityL = stateIn.velocityL() - 2*stateIn.normalVelocityL(normalVector)*normalVector;
 
-    /*u[TwoFluid::U_G] = ghostVelocityG[0];
+    u[TwoFluid::U_G] = ghostVelocityG[0];
     u[TwoFluid::V_G] = ghostVelocityG[1];
     u[TwoFluid::W_G] = ghostVelocityG[2];
+
     u[TwoFluid::U_L] = ghostVelocityL[0];
     u[TwoFluid::V_L] = ghostVelocityL[1];
-    u[TwoFluid::W_L] = ghostVelocityL[2]; - VYPNUTO Z DUVODU POUZITI V RIEMANN SOLVERU*/
+    u[TwoFluid::W_L] = ghostVelocityL[2];  // - VYPNUTO Z DUVODU POUZITI V RIEMANN SOLVERU
 }
 
 
 
-void Wall::correct(const VolField<TwoFluid>& u, const Field<TwoFluid>& ul, const Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const
+void Wall::correct(const VolField<TwoFluid>& u, Field<TwoFluid>& ul, Field<TwoFluid>& ur, const Field<Mat<10,3>>& grad, const Field<Vars<10>>& phi, const Mesh& mesh, const TwoFluidThermo * const thermoModel) const
 {
-    //TODO
+    const std::vector<Face>& faceList = mesh.getFaceList();
+    const std::vector<Cell>& cells = mesh.getCellList();
+    const std::vector<int>& ownerIndexList = mesh.getOwnerIndexList();
+    const std::vector<int>& neighborIndexList = mesh.getNeighborIndexList();
+
+    for (int i = 0; i < boundary.facesIndex.size(); i++)    
+    {
+        const int faceIndex = boundary.facesIndex[i];
+
+        Vars<10> ulDiff = dot(grad[ownerIndexList[faceIndex]], faceList[faceIndex].midpoint - cells[ownerIndexList[faceIndex]].center);
+
+        ul[faceIndex] = u[ownerIndexList[faceIndex]] + phi[ownerIndexList[faceIndex]]*ulDiff;
+        updateState(ul[faceIndex], faceList[faceIndex], ur[faceIndex]);
+    }
 }
 
